@@ -79,15 +79,89 @@ int wmain(int argc, wchar_t * argv[])
         query.str(L"");
     }
 
-    // CREATE TABLE
-    // INSERT, UPDATE, DELETE
-    // DROP TABLE
-    // CASE: CREATE UNIQUE INDEX
+    // CASE: INSERT RANDOM DATA RETURNING ID
+    std::wcout << std::endl << "CASE: INSERT RANDOM DATA RETURNING ID" << std::endl;
+    wchar_t ** const returned_id = new wchar_t * [1]; // INSERT returns id
+    returned_id[0] = new wchar_t[BUFFER_SIZE];
+    query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
+    query << "VALUES ('"
+        << SYMBOLS[rand() % SYMBOLS.size()] << "', "
+        << TIMEFRAMES[rand() % TIMEFRAMES.size()] << ", "
+        << (1.0 + rand()/(RAND_MAX/1.0)) << ", "
+        << (1.0 + rand()/(RAND_MAX/1.0)) << ", "
+        << (1.0 + rand()/(RAND_MAX/1.0)) << ", "
+        << (1.0 + rand()/(RAND_MAX/1.0)) << ") RETURNING \"id\"";
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlFetchRow(wrapper, returned_id, 0);
+    std::wcout << "last_inserted_id = " << returned_id[0] << std::endl;
+    query.str(L"");
+
+    // CASE: UPDATE DATA
+    std::wcout << std::endl << "CASE: UPDATE DATA" << std::endl;
+    query << "UPDATE \"" << _test_data_table << "\" SET \"symbol\" = 'SVKCZK' WHERE \"id\" = " << returned_id[0];
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlAffectedRows(wrapper, affected_rows);
+    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    query.str(L"");
+
+    // CASE: DELETE DATA
+    std::wcout << std::endl << "CASE: DELETE DATA" << std::endl;
+    query << "DELETE FROM \"" << _test_data_table << "\" WHERE \"id\" = " << returned_id[0];
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlAffectedRows(wrapper, affected_rows);
+    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    query.str(L"");
+
+    // CASE: UPDATE NON-EXISTENT DATA
+    std::wcout << std::endl << "CASE: UPDATE NON-EXISTENT DATA" << std::endl;
+    query << "UPDATE \"" << _test_data_table << "\" SET \"symbol\" = 'SVKCZK' WHERE \"id\" = " << returned_id[0];
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlAffectedRows(wrapper, affected_rows);
+    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    query.str(L"");
+
+    // CASE: DELETE NON-EXISTENT DATA
+    std::wcout << std::endl << "CASE: DELETE NON-EXISTENT DATA" << std::endl;
+    query << "DELETE FROM \"" << _test_data_table << "\" WHERE \"id\" = " << returned_id[0];
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlAffectedRows(wrapper, affected_rows);
+    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    query.str(L"");
+
     // CASE: CREATE IMPOSSIBLE UNIQUE INDEX
-    // CASE: CAUSE INSERT COLLISION
-    // CASE: CAUSE UPDATE COLLISION
-    // CASE: DELETE
-    // CASE: DELETE NON-EXISTENT
+    std::wcout << std::endl << "CASE: CREATE IMPOSSIBLE UNIQUE INDEX" << std::endl;
+    query << "CREATE UNIQUE INDEX impossible_unique_index_idx ON \"" << _test_data_table << "\" (\"symbol\")";
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlAffectedRows(wrapper, affected_rows);
+    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    query.str(L"");
+
+    // CASE: CREATE POSSIBLE UNIQUE INDEX
+    std::wcout << std::endl << "CASE: CREATE POSSIBLE UNIQUE INDEX" << std::endl;
+    query << "CREATE UNIQUE INDEX possible_unique_index_idx ON \"" << _test_data_table << "\" ";
+    query << "(\"symbol\", \"timeframe\", \"open\")";  // unlikely to collide
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlAffectedRows(wrapper, affected_rows);
+    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    query.str(L"");
+
+    // CASE: INSERT COLLISION
+    std::wcout << std::endl << "CASE: INSERT COLLISION" << std::endl;
+    query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
+    query << "VALUES ('SVKCZK', 1993, 1.0, 1.0, 1.0, 1.0)";
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
+    query.str(L"");
+
+    // CASE: UPDATE COLLISION
+    std::wcout << std::endl << "CASE: UPDATE COLLISION" << std::endl;
+    query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
+    query << "VALUES ('SVKCZK', 1993, 2.0, 2.0, 2.0, 2.0)";
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    query.str(L"");
+    query << "UPDATE \"" << _test_data_table << "\" SET \"open\" = 1.0 WHERE \"open\" = 2.0";
+    DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
+    query.str(L"");
 
     // CASE: SELECT * FROM
     std::wcout << std::endl << "CASE: SELECT * FROM" << std::endl;
@@ -98,7 +172,7 @@ int wmain(int argc, wchar_t * argv[])
     int num_fields = DllPostgreSqlNumFields(wrapper);
     std::wcout << "num_rows = " << num_rows << ", num_fields = " << num_fields << std::endl;
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
-    std::wcout << "affected_rows = " << affected_rows << std::endl;
+    std::wcout << "affected_rows = " << affected_rows << std::endl; // will be "" after SELECT
 
     // CASE: GET FIELD LIST
     std::wcout << std::endl << "CASE: GET FIELD LIST" << std::endl;
@@ -145,9 +219,8 @@ int wmain(int argc, wchar_t * argv[])
         std::wcout << "field[" << i << "] = " << row[i] << std::endl;
     }
 
-    // CASE: UNSUCCESSFUL SELECT
-
-    // CASE: SUCCESSFUL CLOSE
+    // CASE: CLOSE CONNECTION
+    std::wcout << std::endl << "CASE: CLOSE CONNECTION" << std::endl;
     DllPostgreSqlClose(wrapper);
 
     // CASE: QUERY ON CLOSED CONNECTION (SHOULD TRY RECONNECT)
@@ -162,6 +235,12 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlClose(wrapper);
     
     DllWrapperDestroy(wrapper);
+
+    // CASE: CALL QUERY ON DESTROYED WRAPPER
+    std::wcout << std::endl << "CASE: CALL QUERY ON DESTROYED WRAPPER" << std::endl;
+    query << "SELECT * FROM \"" << _test_data_table << "\" LIMIT 5";
+    DllPostgreSqlQuery(wrapper,	query.str().c_str());
+    query.str(L"");
 
     std::wcout << std::endl << "SUCCESS, HIT SOME KEY AND ENTER" << std::endl;
     wchar_t c;
