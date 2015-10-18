@@ -1,10 +1,3 @@
-
-const wchar_t WRAPPER_VERSION[] = L"0.1";
-const wchar_t NOT_AVAILABLE[] = L"N_A";
-
-const int MAX_RECONNECT_ATTEMPTS = 2;
-const int SLEEP_RECONNECT_FAILED = 1000;
-
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -13,8 +6,13 @@ const int SLEEP_RECONNECT_FAILED = 1000;
 #include <vector>
 #include <Windows.h>
 
-// PostgreSQL
-#include "libpq-fe.h"
+#include "libpq-fe.h" 
+
+const wchar_t WRAPPER_VERSION[] = L"0.1";
+const wchar_t NOT_AVAILABLE[] = L"N_A";
+
+const int MAX_RECONNECT_ATTEMPTS = 2;
+const int SLEEP_RECONNECT_FAILED = 1000;
 
 class Mt4PostgreSqlWrapper
 {
@@ -70,7 +68,6 @@ DLLAPI void DllWrapperLogToStdout(const int wrapper, const bool log_stdout);
 DLLAPI const wchar_t * DllWrapperVersion();
 DLLAPI void DllWrapperWriteLog(const int wapper, const wchar_t * message);
 
-// PostgreSql
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion();

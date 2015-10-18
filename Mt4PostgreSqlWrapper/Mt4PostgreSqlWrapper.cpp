@@ -4,16 +4,22 @@
 //
 #include "stdafx.h"
 
-inline void AnsiToUnicode(const std::string & in, std::wstring * const out) { out->assign(in.begin(), in.end()); }
-inline void UnicodeToAnsi(const std::wstring & in, std::string * const out) { out->assign(in.begin(), in.end()); }
+inline void AnsiToUnicode(const std::string & in, std::wstring * const out) {
+    out->assign(in.begin(), in.end()); 
+}
+
+inline void UnicodeToAnsi(const std::wstring & in, std::string * const out) {
+    out->assign(in.begin(), in.end());
+}
 
 inline void FatalErrorMessageBox(const std::wstring & message) {
     MessageBoxW(NULL, message.c_str(), L"Fatal Error (exception)", MB_ICONERROR | MB_OK);
 }
 
 inline void FillDataNotAvailable(wchar_t ** row, const int num_fields) {
-    for (int i = 0; i < num_fields; i++)
+    for (int i = 0; i < num_fields; i++) {
         wcscpy_s(row[i], (wcslen(NOT_AVAILABLE) + 1), NOT_AVAILABLE);
+    }
 }
 
 inline Mt4PostgreSqlWrapper * const GetMt4PostgreSqlWrapper(const int wrapper) {
@@ -157,8 +163,9 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlCheckConnection()
 {
     std::wstringstream log_message;
 
-    if (PQstatus(this->connection) == CONNECTION_OK)
+    if (PQstatus(this->connection) == CONNECTION_OK) {
         return true;
+    }
 
     log_message << "ERROR: connection closed, trying to reconnect...";
     this->WriteLog(log_message);
@@ -204,8 +211,9 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlFetchRow(wchar_t ** const row, const 
 {
     std::wstringstream log_message;
 
-    if (!this->PostgreSqlCheckConnection())
+    if (!this->PostgreSqlCheckConnection()) {
         return false;
+    }
 
     log_message << "Fetching row: " << row_number;
     this->WriteLog(log_message);
@@ -329,11 +337,13 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlQuery(const std::wstring query)
 {
     std::wstringstream log_message;
 
-    if (!this->PostgreSqlCheckConnection())
+    if (!this->PostgreSqlCheckConnection()) {
         return false;
+    }
 
-    if (this->result != NULL)
+    if (this->result != NULL) {
         this->PostgreSqlClearResult();
+    }
 
     // TODO: use transactions
 
@@ -501,8 +511,9 @@ void Mt4PostgreSqlWrapper::WriteLog(std::wstringstream & log_message)
         << std::setw(3) << std::setfill('0') << st.wMilliseconds;
 
     formatted_message << timestamp.str() << " ";
-    if (!this->log_prefix.empty())
+    if (!this->log_prefix.empty()) {
         formatted_message << "[" << this->log_prefix << "] ";
+    }
     formatted_message << _log_message << std::endl;
 
     if (this->log_to_stdout) { std::cout << formatted_message.str(); }
@@ -512,7 +523,7 @@ void Mt4PostgreSqlWrapper::WriteLog(std::wstringstream & log_message)
             this->log_file.c_str(), FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL
         );
         if (_log_file_handle == INVALID_HANDLE_VALUE) {
-            error_message << "Cannot create file: " << this->log_file.c_str() << " (Error:" << GetLastError() << ")";
+            error_message << "Cannot create file: " << this->log_file.c_str() << " (Error: " << GetLastError() << ")";
             this->log_file = "";
             FatalErrorMessageBox(error_message.str());
         } else {

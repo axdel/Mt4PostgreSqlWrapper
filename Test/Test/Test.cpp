@@ -2,9 +2,6 @@
 // NOTES:
 //    - test asumes a database with name "test" exists
 //
-
-// N_A fields have data :/
-
 #include "stdafx.h"
 
 int wmain(int argc, wchar_t * argv[])
