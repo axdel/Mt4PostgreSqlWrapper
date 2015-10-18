@@ -1,11 +1,20 @@
 LIBRARY	"Mt4PostgreSqlWrapper"
 EXPORTS
+DllWrapperDestroy
+DllWrapperInit
+DllWrapperLogFile
+DllWrapperLogPrefix
+DllWrapperLogToStdout
+DllWrapperVersion
+DllWrapperWriteLog
+DllPostgreSqlAffectedRows
+DllPostgreSqlClearResult
+DllPostgreSqlClientVersion
 DllPostgreSqlClose
 DllPostgreSqlConnect
 DllPostgreSqlFetchRow
-DllPostgreSqlLog
+DllPostgreSqlFieldList
 DllPostgreSqlNumFields
 DllPostgreSqlNumRows
 DllPostgreSqlQuery
-DllPostgreSqlVersion
-DllPostgreSqlWrapperVersion
+DllPostgreSqlServerVersion

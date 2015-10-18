@@ -19,42 +19,42 @@ const int SLEEP_RECONNECT_FAILED = 1000;
 class Mt4PostgreSqlWrapper
 {
 private:
-	PGconn * connection = NULL;
-	std::wstring connection_string = L"";
-	std::string _connection_string = "";
+    PGconn * connection = NULL;
+    std::wstring connection_string = L"";
+    std::string _connection_string = "";
 
-	PGresult * result = NULL;
-	int num_rows = 0;
-	int num_fields = 0;
-	std::wstring affected_rows = L"";
+    PGresult * result = NULL;
+    int num_rows = 0;
+    int num_fields = 0;
+    std::wstring affected_rows = L"";
 
-	bool log_to_stdout = true;
-	std::string log_file = "";
-	std::string log_prefix = "";
+    bool log_to_stdout = true;
+    std::string log_file = "";
+    std::string log_prefix = "";
 
-	const bool PostgreSqlCheckConnection();
+    const bool PostgreSqlCheckConnection();
 
 public:
-	Mt4PostgreSqlWrapper();
-	~Mt4PostgreSqlWrapper();
+    Mt4PostgreSqlWrapper();
+    ~Mt4PostgreSqlWrapper();
 
-	const std::wstring PostgreSqlAffectedRows();
-	void PostgreSqlClearResult();
-	const int PostgreSqlClientVersion();
-	void PostgreSqlClose();
-	const bool PostgreSqlConnect(const std::wstring connection_string);
-	const bool PostgreSqlFetchRow(wchar_t ** const row, const int row_number);
-	const std::wstring PostgreSqlFieldList();
-	void PostgreSqlLog(const std::wstring message);
-	const int PostgreSqlNumFields();
-	const int PostgreSqlNumRows();
-	const bool PostgreSqlQuery(const std::wstring query);
-	const int PostgreSqlServerVersion();
+    const std::wstring PostgreSqlAffectedRows();
+    void PostgreSqlClearResult();
+    const int PostgreSqlClientVersion();
+    void PostgreSqlClose();
+    const bool PostgreSqlConnect(const std::wstring connection_string);
+    const bool PostgreSqlFetchRow(wchar_t ** const row, const int row_number);
+    const std::wstring PostgreSqlFieldList();
+    void PostgreSqlLog(const std::wstring message);
+    const int PostgreSqlNumFields();
+    const int PostgreSqlNumRows();
+    const bool PostgreSqlQuery(const std::wstring query);
+    const int PostgreSqlServerVersion();
 
-	void WrapperLogFile(const std::string log_file);
-	void WrapperLogPrefix(const std::string log_prefix);
-	void WrapperLogToStdout(const bool log_stdout);
-	void WriteLog(std::wstringstream & log_message);
+    void WrapperLogFile(const std::string log_file);
+    void WrapperLogPrefix(const std::string log_prefix);
+    void WrapperLogToStdout(const bool log_stdout);
+    void WriteLog(std::wstringstream & log_message);
 };
 
 //
