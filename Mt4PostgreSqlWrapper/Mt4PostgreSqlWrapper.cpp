@@ -1,6 +1,6 @@
 //
 // NOTES:
-//    - exception handling model has to be "/EHa"s
+//    - exception handling model has to be "/EHa"
 //
 #include "stdafx.h"
 
