@@ -19,7 +19,6 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
     DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database");
     DllPostgreSqlClose(wrapper);
-    DllPostgreSqlClose(wrapper);
 
     // CASE: WRITE LOG
     std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
