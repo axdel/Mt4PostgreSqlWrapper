@@ -16,12 +16,6 @@ inline void FatalErrorMessageBox(const std::wstring & message) {
     MessageBoxW(NULL, message.c_str(), L"Fatal Error (exception)", MB_ICONERROR | MB_OK);
 }
 
-inline void FillDataNotAvailable(wchar_t ** row, const int num_fields) {
-    for (int i = 0; i < num_fields; i++) {
-        wcscpy_s(row[i], (wcslen(NOT_AVAILABLE) + 1), NOT_AVAILABLE);
-    }
-}
-
 inline Mt4PostgreSqlWrapper * const GetMt4PostgreSqlWrapper(const int wrapper) {
     return reinterpret_cast<Mt4PostgreSqlWrapper * const>(wrapper);
 }
@@ -220,13 +214,11 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlFetchRow(wchar_t ** const row, const 
     if (this->result == NULL) {
         log_message << "ERROR: no active result found (probably cleared?)";
         this->WriteLog(log_message);
-        FillDataNotAvailable(row, this->num_fields);
         return false;
     }
     if ((row_number + 1) > this->num_rows) {
         log_message << "ERROR: cannot fetch row " << row_number << " (#rows:" << this->num_rows << ")";
         this->WriteLog(log_message);
-        FillDataNotAvailable(row, this->num_fields);
         return false;
     }
 
@@ -264,11 +256,9 @@ const std::wstring Mt4PostgreSqlWrapper::PostgreSqlFieldList()
 
     log_message << "Field list: ";
     if (this->result == NULL) {
-        log_message << NOT_AVAILABLE;
-        this->WriteLog(log_message);
         log_message << "ERROR: no active result found (probably cleared?)";
         this->WriteLog(log_message);
-        return NOT_AVAILABLE;
+        return L"";
     }
 
     for (int i = 0; i < this->num_fields; i++) {
