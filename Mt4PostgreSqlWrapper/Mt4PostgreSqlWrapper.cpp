@@ -53,7 +53,7 @@ const std::wstring Mt4PostgreSqlWrapper::PostgreSqlAffectedRows()
     return this->affected_rows;
 }
 
-void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * affected_rows)
+void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows)
 {
     try {
         Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
@@ -127,7 +127,7 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlConnect(const std::wstring connection
             this->WriteLog(log_message);
             return true;
         } else {
-            log_message << "failed [" << this->connection << ", w:" << this << "]" << std::endl << PQerrorMessage(this->connection);
+            log_message << "failed [c:" << this->connection << ", w:" << this << "]" << std::endl << PQerrorMessage(this->connection);
             this->WriteLog(log_message);
             error_message << "Attempt #" << i << ": ";
             error_message << PQerrorMessage(this->connection);
@@ -139,7 +139,7 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlConnect(const std::wstring connection
     return false;
 }
 
-const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * connection_string)
+const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string)
 {
     try {
         Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
@@ -256,6 +256,7 @@ const std::wstring Mt4PostgreSqlWrapper::PostgreSqlFieldList()
 
     log_message << "Field list: ";
     if (this->result == NULL) {
+        this->WriteLog(log_message);
         log_message << "ERROR: no active result found (probably cleared?)";
         this->WriteLog(log_message);
         return L"";
@@ -271,7 +272,7 @@ const std::wstring Mt4PostgreSqlWrapper::PostgreSqlFieldList()
     return field_list.str();
 }
 
-void DllPostgreSqlFieldList(const int wrapper, wchar_t * field_list)
+void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list)
 {
     try {
         Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
@@ -525,7 +526,7 @@ void Mt4PostgreSqlWrapper::WriteLog(std::wstringstream & log_message)
     return;
 }
 
-void DllWrapperWriteLog(const int wrapper, const wchar_t * log_message)
+void DllWrapperWriteLog(const int wrapper, const wchar_t * const log_message)
 {
     try {
         Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);

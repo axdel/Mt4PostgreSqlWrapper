@@ -62,11 +62,11 @@ public:
 
 DLLAPI void DllWrapperDestroy(const int wrapper);
 DLLAPI const int DllWrapperInit();
-DLLAPI void DllWrapperLogFile(const int wrapper, const wchar_t * log_file);
-DLLAPI void DllWrapperLogPrefix(const int wrapper, const wchar_t * log_prefix);
+DLLAPI void DllWrapperLogFile(const int wrapper, const wchar_t * const log_file);
+DLLAPI void DllWrapperLogPrefix(const int wrapper, const wchar_t * const log_prefix);
 DLLAPI void DllWrapperLogToStdout(const int wrapper, const bool log_stdout);
 DLLAPI const wchar_t * DllWrapperVersion();
-DLLAPI void DllWrapperWriteLog(const int wapper, const wchar_t * message);
+DLLAPI void DllWrapperWriteLog(const int wapper, const wchar_t * const message);
 
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
