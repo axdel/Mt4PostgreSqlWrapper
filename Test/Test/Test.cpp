@@ -203,10 +203,10 @@ int wmain(int argc, wchar_t * argv[])
 
     // CASE: FETCH ROW(S) ON CLEARED RESULT
     std::wcout << std::endl << "CASE: FETCH ROW(S) ON CLEARED RESULT" << std::endl;
-    for (int i = 0; i < num_rows; i++) {
+    for (int i = 0; i < DllPostgreSqlNumRows(wrapper); i++) {
         std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
         DllPostgreSqlFetchRow(wrapper, row, i);
-        for (int j = 0; j < num_fields; j++) {
+        for (int j = 0; j < DllPostgreSqlNumFields(wrapper); j++) {
             std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
         }
         std::wcout << std::endl;
@@ -215,7 +215,7 @@ int wmain(int argc, wchar_t * argv[])
     // CASE: FETCH NON-EXISTENT ROW
     std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW" << std::endl;
     DllPostgreSqlFetchRow(wrapper, row, 100);
-    for (int i = 0; i < num_fields; i++) {
+    for (int i = 0; i < DllPostgreSqlNumFields(wrapper); i++) {
         std::wcout << "field[" << i << "] = " << row[i] << std::endl;
     }
 
