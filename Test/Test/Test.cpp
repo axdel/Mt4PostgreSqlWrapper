@@ -88,8 +88,7 @@ int wmain(int argc, wchar_t * argv[])
 
     // CASE: INSERT RANDOM DATA RETURNING ID
     std::wcout << std::endl << "CASE: INSERT RANDOM DATA RETURNING ID" << std::endl;
-    wchar_t ** const returned_id = new wchar_t * [1]; // INSERT returns id
-    returned_id[0] = new wchar_t[BUFFER_SIZE];
+    wchar_t * returned_id = new wchar_t[BUFFER_SIZE]; // INSERT returns id
     query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
     query << "VALUES ('"
         << SYMBOLS[rand() % SYMBOLS.size()] << "', "
@@ -99,8 +98,8 @@ int wmain(int argc, wchar_t * argv[])
         << (1.0 + rand()/(RAND_MAX/1.0)) << ", "
         << (1.0 + rand()/(RAND_MAX/1.0)) << ") RETURNING \"id\"";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
-    DllPostgreSqlFetchRow(wrapper, returned_id, 0);
-    std::wcout << "last_inserted_id = " << returned_id[0] << std::endl;
+    DllPostgreSqlFetchField(wrapper, returned_id, 0, 0);
+    std::wcout << "last_inserted_id = " << returned_id << std::endl;
     query.str(L"");
 
     // CASE: UPDATE DATA
@@ -187,14 +186,14 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlFieldList(wrapper, field_list);
     std::wcout << "field_list = " << field_list << std::endl;
 
-    // CASE: FETCH ROW(S)
-    std::wcout << std::endl << "CASE: FETCH ROW(S)" << std::endl;
+    // CASE: FETCH FIELDS
+    std::wcout << std::endl << "CASE: FETCH FIELDS" << std::endl;
     wchar_t ** row = new wchar_t * [num_fields];
     for (int i = 0; i < num_fields; i++) { row[i] = new wchar_t[BUFFER_SIZE]; }
     for (int i = 0; i < num_rows; i++) {
         std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
-        DllPostgreSqlFetchRow(wrapper, row, i);
         for (int j = 0; j < num_fields; j++) {
+            DllPostgreSqlFetchField(wrapper, row[j], i, j);
             std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
         }
         std::wcout << std::endl;
@@ -212,16 +211,18 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: FETCH ROW(S) ON CLEARED RESULT" << std::endl;
     for (int i = 0; i < DllPostgreSqlNumRows(wrapper); i++) {
         std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
-        DllPostgreSqlFetchRow(wrapper, row, i);
-        for (int j = 0; j < DllPostgreSqlNumFields(wrapper); j++) {
+        for (int j = 0; j < num_fields; j++) {
+            DllPostgreSqlFetchField(wrapper, row[i], i, j);
             std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
         }
         std::wcout << std::endl;
     }
 
-    // CASE: FETCH NON-EXISTENT ROW
-    std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW" << std::endl;
-    DllPostgreSqlFetchRow(wrapper, row, 100);
+    // CASE: FETCH NON-EXISTENT ROW/FIELD
+    std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW/FIELD" << std::endl;
+    wchar_t * const field = new wchar_t[BUFFER_SIZE];
+    DllPostgreSqlFetchField(wrapper, field, 100, 0);
+    DllPostgreSqlFetchField(wrapper, field, 0, 100);
     for (int i = 0; i < DllPostgreSqlNumFields(wrapper); i++) {
         std::wcout << "field[" << i << "] = " << row[i] << std::endl;
     }
