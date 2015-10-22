@@ -2,12 +2,10 @@
 #define POSTGRESQL_H
 
 #include <ctime>
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 
 #define WIN32_LEAN_AND_MEAN
-//#include <SDKDDKVer.h>
 #include <Windows.h>
 
 #include "libpq-fe.h"

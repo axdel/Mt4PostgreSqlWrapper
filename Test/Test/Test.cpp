@@ -239,7 +239,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlClose(wrapper);
     
     DllLoggerDestroy(logger);
-    // CASE: WRITE LOG IN DESTROYED LOGGER
+    // CASE: WRITE LOG ON DESTROYED LOGGER
     std::wcout << std::endl << "CASE: WRITE LOG ON DESTROYED LOGGER" << std::endl;
     DllPostgreSqlWriteLog(wrapper, L"This is message from postgresql");
     DllLoggerWriteLog(logger, L"This is message from logger");

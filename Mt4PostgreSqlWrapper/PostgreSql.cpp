@@ -21,7 +21,7 @@ const int DllPostgreSqlInit()
 //
 PostgreSql::~PostgreSql() {}
 
-void DllPostgreSqlDestroy(const int wrapper)
+DLLAPI void DllPostgreSqlDestroy(const int wrapper)
 {
     try {
         PostgreSql * _wrapper = GetPostgreSql(wrapper);
@@ -39,7 +39,7 @@ const std::wstring PostgreSql::AffectedRows()
     return this->affected_rows;
 }
 
-void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows)
+DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows)
 {
     try {
         PostgreSql * _wrapper = GetPostgreSql(wrapper);
@@ -71,7 +71,7 @@ void PostgreSql::ClearResult()
     this->WriteLog(log_message);
 }
 
-void DllPostgreSqlClearResult(const int wrapper)
+DLLAPI void DllPostgreSqlClearResult(const int wrapper)
 {
     try {
         PostgreSql * _wrapper = GetPostgreSql(wrapper);
@@ -84,7 +84,7 @@ void DllPostgreSqlClearResult(const int wrapper)
 //
 // ClientVersion
 //
-const int DllPostgreSqlClientVersion()
+DLLAPI const int DllPostgreSqlClientVersion()
 {
     return PQlibVersion();
 }
@@ -125,7 +125,7 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
     return false;
 }
 
-const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string)
+DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string)
 {
     try {
         PostgreSql * _wrapper = GetPostgreSql(wrapper);
@@ -172,7 +172,7 @@ void PostgreSql::Close()
     this->WriteLog(log_message);
 }
 
-void DllPostgreSqlClose(const int wrapper)
+DLLAPI void DllPostgreSqlClose(const int wrapper)
 {
     std::wstringstream log_message;
 
@@ -221,7 +221,7 @@ const bool PostgreSql::FetchRow(wchar_t ** const row, const int row_number)
     return true;
 }
 
-const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const int row_number)
+DLLAPI const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const int row_number)
 {
     try {
         PostgreSql * _wrapper = GetPostgreSql(wrapper);
@@ -258,7 +258,7 @@ const std::wstring PostgreSql::FieldList()
     return field_list.str();
 }
 
-void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list)
+DLLAPI void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
@@ -277,7 +277,7 @@ const int PostgreSql::NumFields()
     return this->num_fields;
 }
 
-const int DllPostgreSqlNumFields(const int wrapper)
+DLLAPI const int DllPostgreSqlNumFields(const int wrapper)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
@@ -296,7 +296,7 @@ const int PostgreSql::NumRows()
     return this->num_rows;
 }
 
-const int DllPostgreSqlNumRows(const int wrapper)
+DLLAPI const int DllPostgreSqlNumRows(const int wrapper)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
@@ -367,7 +367,7 @@ const bool PostgreSql::Query(const std::wstring query)
     return true;
 }
 
-const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query)
+DLLAPI const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
@@ -386,7 +386,7 @@ const int PostgreSql::ServerVersion()
     return PQserverVersion(this->connection);
 }
 
-const int DllPostgreSqlServerVersion(const int wrapper)
+DLLAPI const int DllPostgreSqlServerVersion(const int wrapper)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
@@ -405,7 +405,7 @@ void PostgreSql::SetLogger(Logger * const logger)
     this->logger = logger;
 }
 
-void DllPostgreSqlSetLogger(const int wrapper, const int logger)
+DLLAPI void DllPostgreSqlSetLogger(const int wrapper, const int logger)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
@@ -418,7 +418,7 @@ void DllPostgreSqlSetLogger(const int wrapper, const int logger)
 //
 // WrapperVersion
 //
-const wchar_t * DllWrapperVersion()
+DLLAPI const wchar_t * DllPostgreSqlWrapperVersion()
 {
     return WRAPPER_VERSION;
 }
@@ -435,7 +435,7 @@ void PostgreSql::WriteLog(std::wstringstream & log_message)
     }
 }
 
-void DllPostgreSqlWriteLog(const int wrapper, const wchar_t * log_message)
+DLLAPI void DllPostgreSqlWriteLog(const int wrapper, const wchar_t * log_message)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
