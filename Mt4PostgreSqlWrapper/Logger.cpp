@@ -104,7 +104,7 @@ void Logger::WriteLog(std::wstringstream & log_message)
 DLLAPI void DllLoggerWriteLog(const int logger, const wchar_t * const log_message)
 {
     try {
-        Logger * _logger = GetLogger(logger);
+        Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
         return _logger->WriteLog(_log_message);

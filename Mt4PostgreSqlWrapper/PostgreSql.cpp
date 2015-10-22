@@ -24,7 +24,7 @@ PostgreSql::~PostgreSql() {}
 DLLAPI void DllPostgreSqlDestroy(const int wrapper)
 {
     try {
-        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
         delete _wrapper;
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlWrapperDestroy - called on already destroyed wrapper.");
@@ -42,7 +42,7 @@ const std::wstring PostgreSql::AffectedRows()
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows)
 {
     try {
-        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        PostgreSql  * const _wrapper = GetPostgreSql(wrapper);
         std::wstring _affected_rows = _wrapper->AffectedRows();
         wcscpy_s(affected_rows, (_affected_rows.length() + 1), _affected_rows.c_str());
     } catch (...) {
@@ -74,7 +74,7 @@ void PostgreSql::ClearResult()
 DLLAPI void DllPostgreSqlClearResult(const int wrapper)
 {
     try {
-        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
         _wrapper->ClearResult();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlClearResult - called on already destroyed wrapper.");
@@ -128,7 +128,7 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
 DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string)
 {
     try {
-        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
         return _wrapper->Connect(connection_string);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlConnect - called on already destroyed wrapper.");
@@ -177,7 +177,7 @@ DLLAPI void DllPostgreSqlClose(const int wrapper)
     std::wstringstream log_message;
 
     try {
-        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
         _wrapper->Close();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlClose - called on already destroyed wrapper.");
@@ -224,7 +224,7 @@ const bool PostgreSql::FetchRow(wchar_t ** const row, const int row_number)
 DLLAPI const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const int row_number)
 {
     try {
-        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
         return _wrapper->FetchRow(row, row_number);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlFetchRow - called on already destroyed wrapper.");
