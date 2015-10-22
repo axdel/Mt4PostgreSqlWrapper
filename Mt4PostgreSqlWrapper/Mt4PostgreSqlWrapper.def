@@ -9,7 +9,7 @@ DllPostgreSqlClearResult
 DllPostgreSqlClientVersion
 DllPostgreSqlClose
 DllPostgreSqlConnect
-DllPostgreSqlFetchRow
+DllPostgreSqlFetchField
 DllPostgreSqlFieldList
 DllPostgreSqlNumFields
 DllPostgreSqlNumRows

@@ -185,49 +185,42 @@ DLLAPI void DllPostgreSqlClose(const int wrapper)
 }
 
 //
-// FetchRow
+// FetchField
 //
-const bool PostgreSql::FetchRow(wchar_t ** const row, const int row_number)
+const bool PostgreSql::FetchField(wchar_t * field, const int row_num, const int field_num)
 {
     std::wstringstream log_message;
+    std::wstring _field;
 
-    if (!this->CheckConnection()) {
-        return false;
-    }
-
-    log_message << "Fetching row: " << row_number;
-    this->WriteLog(log_message);
     if (this->result == NULL) {
         log_message << "ERROR: no active result found (probably cleared?)";
         this->WriteLog(log_message);
         return false;
     }
-    if ((row_number + 1) > this->num_rows) {
-        log_message << "ERROR: cannot fetch row " << row_number << " (#rows:" << this->num_rows << ")";
+    if ((row_num + 1) > this->num_rows || (field_num + 1) > this->num_fields) {
+        log_message << "ERROR: cannot fetch row: " << row_num << ", field: " << field_num;
+        log_message << " (#rows:" << this->num_rows << ", #fields:" << this->num_fields << ")";
         this->WriteLog(log_message);
         return false;
     }
 
-    std::wstring _field = L"";
-    for (int i = 0; i < this->num_fields; i++) {
-        if (!PQgetisnull(this->result, row_number, i)) {
-            AnsiToUnicode(PQgetvalue(this->result, row_number, i), &_field);
-            wcscpy_s(row[i], (_field.length() + 1), _field.c_str());
-        } else {
-            wcscpy_s(row[i], 5, L"NULL");
-        }
+    if (!PQgetisnull(this->result, row_num, field_num)) {
+        AnsiToUnicode(PQgetvalue(this->result, row_num, field_num), &_field);
+        wcscpy_s(field, (_field.length() + 1), _field.c_str());
+    } else {
+        wcscpy_s(field, 5, L"NULL");
     }
 
     return true;
 }
 
-DLLAPI const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const int row_number)
+DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * field, const int row_num, const int field_num)
 {
-    try {
+   try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
-        return _wrapper->FetchRow(row, row_number);
+        return _wrapper->FetchField(field, row_num, field_num);
     } catch (...) {
-        FatalErrorMessageBox(L"DllPostgreSqlFetchRow - called on already destroyed wrapper.");
+        FatalErrorMessageBox(L"DllPostgreSqlFetchField - called on already destroyed wrapper.");
         return false;
     }
 }
@@ -430,12 +423,10 @@ void PostgreSql::WriteLog(std::wstringstream & log_message)
 {
     if (this->logger != NULL) {
         this->logger->WriteLog(log_message);
-    } else {
-        FatalErrorMessageBox(L"DllPostgreSqlWriteLog - no logger set.");
     }
 }
 
-DLLAPI void DllPostgreSqlWriteLog(const int wrapper, const wchar_t * log_message)
+DLLAPI void DllPostgreSqlWriteLog(const int wrapper, const wchar_t * const log_message)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);

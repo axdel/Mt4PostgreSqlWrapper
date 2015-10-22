@@ -16,6 +16,9 @@ int wmain(int argc, wchar_t * argv[])
 
     const int wrapper = DllPostgreSqlInit();
     const int logger = DllLoggerInit(L"C:\\test.log", L"EURUSD");
+
+    // CASE: USE NO SET LOGGER
+    DllPostgreSqlWriteLog(wrapper, L"This should rise error");
     DllPostgreSqlSetLogger(wrapper, logger);
 
     // CASE: UNSUCCESSFUL CONNECTION

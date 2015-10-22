@@ -59,6 +59,7 @@ DLLAPI const int DllLoggerGetLogger(const int logger)
         return _logger->GetLogger();
     } catch (...) {
         FatalErrorMessageBox(L"DllLoggerGetLogger - called on already destroyed logger.");
+        return NULL;
     }
 }
 

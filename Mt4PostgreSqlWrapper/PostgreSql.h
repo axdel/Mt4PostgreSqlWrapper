@@ -42,7 +42,7 @@ public:
     const int ClientVersion();
     void Close();
     const bool Connect(const std::wstring connection_string);
-    const bool FetchRow(wchar_t ** const row, const int row_number);
+    const bool FetchField(wchar_t * field, const int row_num, const int field_num);
     const std::wstring FieldList();
     const int NumFields();
     const int NumRows();
@@ -66,14 +66,14 @@ DLLAPI void DllPostgreSqlDestroy(const int wrapper);
 DLLAPI const int DllPostgreSqlInit();
 
 DLLAPI void DllPostgreSqlSetLogger(const int wrapper, const int logger);
-DLLAPI void DllPostgreSqlWriteLog(const int wapper, const wchar_t * const message);
+DLLAPI void DllPostgreSqlWriteLog(const int wapper, const wchar_t * const log_message);
 
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion();
 DLLAPI void DllPostgreSqlClose(const int wrapper);
 DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string);
-DLLAPI const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const int row_number);
+DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * field, const int row_num, const int field_num);
 DLLAPI void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list);
 DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
