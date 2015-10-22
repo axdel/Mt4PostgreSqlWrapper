@@ -18,7 +18,7 @@ private:
 
     HANDLE log_file_handle = NULL;
 
-    bool log_to_stdout = true;
+    bool log_to_stdout = false;
     void SetLogToStdout(const bool log_to_stdout);
 
 public:
