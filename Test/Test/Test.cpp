@@ -2,7 +2,10 @@
 // NOTES:
 //    - test asumes a database with name "test" exists
 //
-#include "stdafx.h"
+#include <vector>
+
+#include "Logger.h"
+#include "PostgreSql.h"
 
 int wmain(int argc, wchar_t * argv[])
 {
@@ -11,9 +14,9 @@ int wmain(int argc, wchar_t * argv[])
     std::wstring _test_data_table = L"_test_data_table";
     std::wstringstream query;
 
-    const int wrapper = DllWrapperInit();
-    DllWrapperLogPrefix(wrapper, L"EURUSD");
-    DllWrapperLogFile(wrapper, L"C:\\test.log");
+    const int wrapper = DllPostgreSqlInit();
+    const int logger = DllLoggerInit(L"C:\\test.log", L"EURUSD");
+    DllPostgreSqlSetLogger(wrapper, logger);
 
     // CASE: UNSUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
@@ -22,7 +25,9 @@ int wmain(int argc, wchar_t * argv[])
 
     // CASE: WRITE LOG
     std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
-    DllWrapperWriteLog(wrapper, L"Is this the most important message or what?");
+    DllPostgreSqlWriteLog(wrapper, L"This is message from postgresql");
+    DllLoggerWriteLog(logger, L"This is message from logger");
+    DllPostgreSqlWriteLog(wrapper, L"This is again from postgresql");
 
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
@@ -233,8 +238,13 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlClose(wrapper);
     DllPostgreSqlClose(wrapper);
     
-    DllWrapperDestroy(wrapper);
+    DllLoggerDestroy(logger);
+    // CASE: WRITE LOG IN DESTROYED LOGGER
+    std::wcout << std::endl << "CASE: WRITE LOG ON DESTROYED LOGGER" << std::endl;
+    DllPostgreSqlWriteLog(wrapper, L"This is message from postgresql");
+    DllLoggerWriteLog(logger, L"This is message from logger");
 
+    DllPostgreSqlDestroy(wrapper);
     // CASE: CALL QUERY ON DESTROYED WRAPPER
     std::wcout << std::endl << "CASE: CALL QUERY ON DESTROYED WRAPPER" << std::endl;
     query << "SELECT * FROM \"" << _test_data_table << "\" LIMIT 5";

@@ -47,12 +47,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Administrator\Dropbox\Trading\Dlls\Mt4PostgreSqlWrapper\Mt4PostgreSqlWrapper;C:\Program Files %28x86%29\PostgreSQL\9.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -79,16 +81,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Common.h" />
+    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Logger.h" />
+    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\PostgreSql.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Mt4PostrgeSqlWrapper.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Mt4PostgreSqlWrapper\Mt4PostgreSqlWrapper.cpp" />
-    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="..\..\Mt4PostgreSqlWrapper\Logger.cpp" />
+    <ClCompile Include="..\..\Mt4PostgreSqlWrapper\PostgreSql.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

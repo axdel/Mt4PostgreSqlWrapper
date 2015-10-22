@@ -2,53 +2,39 @@
 // NOTES:
 //    - exception handling model has to be "/EHa"
 //
-#include "stdafx.h"
-
-inline void AnsiToUnicode(const std::string & in, std::wstring * const out) {
-    out->assign(in.begin(), in.end()); 
-}
-
-inline void UnicodeToAnsi(const std::wstring & in, std::string * const out) {
-    out->assign(in.begin(), in.end());
-}
-
-inline void FatalErrorMessageBox(const std::wstring & message) {
-    MessageBoxW(NULL, message.c_str(), L"Fatal Error (exception)", MB_ICONERROR | MB_OK);
-}
-
-inline Mt4PostgreSqlWrapper * const GetMt4PostgreSqlWrapper(const int wrapper) {
-    return reinterpret_cast<Mt4PostgreSqlWrapper * const>(wrapper);
-}
+#include "Common.h"
+#include "Logger.h"
+#include "PostgreSql.h"
 
 //
-// WrapperInit
+// PostgreSqlInit
 //
-Mt4PostgreSqlWrapper::Mt4PostgreSqlWrapper() {}
+PostgreSql::PostgreSql() {}
 
-const int DllWrapperInit()
+const int DllPostgreSqlInit()
 {
-    return reinterpret_cast<const int>(new Mt4PostgreSqlWrapper());
+    return reinterpret_cast<const int>(new PostgreSql());
 }
 
 //
-// WrapperDestroy
+// PostgreSqlDestroy
 //
-Mt4PostgreSqlWrapper::~Mt4PostgreSqlWrapper() {}
+PostgreSql::~PostgreSql() {}
 
-void DllWrapperDestroy(const int wrapper)
+void DllPostgreSqlDestroy(const int wrapper)
 {
     try {
-        Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
+        PostgreSql * _wrapper = GetPostgreSql(wrapper);
         delete _wrapper;
     } catch (...) {
-        FatalErrorMessageBox(L"DllWrapperDestroy - called on already destroyed wrapper.");
+        FatalErrorMessageBox(L"DllPostgreSqlWrapperDestroy - called on already destroyed wrapper.");
     }
 }
 
 //
-// PostgreSqlAffectedRows
+// AffectedRows
 //
-const std::wstring Mt4PostgreSqlWrapper::PostgreSqlAffectedRows()
+const std::wstring PostgreSql::AffectedRows()
 {
     return this->affected_rows;
 }
@@ -56,8 +42,8 @@ const std::wstring Mt4PostgreSqlWrapper::PostgreSqlAffectedRows()
 void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows)
 {
     try {
-        Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        std::wstring _affected_rows = _wrapper->PostgreSqlAffectedRows();
+        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        std::wstring _affected_rows = _wrapper->AffectedRows();
         wcscpy_s(affected_rows, (_affected_rows.length() + 1), _affected_rows.c_str());
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlAffectedRows - called on already destroyed wrapper.");
@@ -65,9 +51,9 @@ void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows)
 }
 
 //
-// PostgreSqlClearResult
+// ClearResult
 //
-void Mt4PostgreSqlWrapper::PostgreSqlClearResult()
+void PostgreSql::ClearResult()
 {
     std::wstringstream log_message;
 
@@ -88,15 +74,15 @@ void Mt4PostgreSqlWrapper::PostgreSqlClearResult()
 void DllPostgreSqlClearResult(const int wrapper)
 {
     try {
-        Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        _wrapper->PostgreSqlClearResult();
+        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        _wrapper->ClearResult();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlClearResult - called on already destroyed wrapper.");
     }
 }
 
 //
-// PostrgeSqlClientVersion
+// ClientVersion
 //
 const int DllPostgreSqlClientVersion()
 {
@@ -104,9 +90,9 @@ const int DllPostgreSqlClientVersion()
 }
 
 //
-// PostgreSqlConnect
+// Connect
 //
-const bool Mt4PostgreSqlWrapper::PostgreSqlConnect(const std::wstring connection_string)
+const bool PostgreSql::Connect(const std::wstring connection_string)
 {
     std::wstringstream log_message;
     std::wstringstream error_message;
@@ -142,8 +128,8 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlConnect(const std::wstring connection
 const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string)
 {
     try {
-        Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        return _wrapper->PostgreSqlConnect(connection_string);
+        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->Connect(connection_string);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlConnect - called on already destroyed wrapper.");
         return false;
@@ -151,9 +137,9 @@ const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connect
 }
 
 //
-// PostgreSqlCheckConnection
+// CheckConnection
 //
-const bool Mt4PostgreSqlWrapper::PostgreSqlCheckConnection()
+const bool PostgreSql::CheckConnection()
 {
     std::wstringstream log_message;
 
@@ -164,14 +150,14 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlCheckConnection()
     log_message << "ERROR: connection closed, trying to reconnect...";
     this->WriteLog(log_message);
 
-    this->PostgreSqlClose();
-    return this->PostgreSqlConnect(this->connection_string);
+    this->Close();
+    return this->Connect(this->connection_string);
 }
 
 //
-// PostgreSqlClose
+// Close
 //
-void Mt4PostgreSqlWrapper::PostgreSqlClose()
+void PostgreSql::Close()
 {
     std::wstringstream log_message;
 
@@ -191,21 +177,21 @@ void DllPostgreSqlClose(const int wrapper)
     std::wstringstream log_message;
 
     try {
-        Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        _wrapper->PostgreSqlClose();
+        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        _wrapper->Close();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlClose - called on already destroyed wrapper.");
     }
 }
 
 //
-// PostgreSqlFetchRow
+// FetchRow
 //
-const bool Mt4PostgreSqlWrapper::PostgreSqlFetchRow(wchar_t ** const row, const int row_number)
+const bool PostgreSql::FetchRow(wchar_t ** const row, const int row_number)
 {
     std::wstringstream log_message;
 
-    if (!this->PostgreSqlCheckConnection()) {
+    if (!this->CheckConnection()) {
         return false;
     }
 
@@ -238,8 +224,8 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlFetchRow(wchar_t ** const row, const 
 const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const int row_number)
 {
     try {
-        Mt4PostgreSqlWrapper * _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        return _wrapper->PostgreSqlFetchRow(row, row_number);
+        PostgreSql * _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->FetchRow(row, row_number);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlFetchRow - called on already destroyed wrapper.");
         return false;
@@ -247,9 +233,9 @@ const bool DllPostgreSqlFetchRow(const int wrapper, wchar_t ** const row, const 
 }
 
 //
-// PostgreSqlFieldList
+// FieldList
 //
-const std::wstring Mt4PostgreSqlWrapper::PostgreSqlFieldList()
+const std::wstring PostgreSql::FieldList()
 {
     std::wstringstream log_message;
     std::wstringstream field_list;
@@ -275,8 +261,8 @@ const std::wstring Mt4PostgreSqlWrapper::PostgreSqlFieldList()
 void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        std::wstring _field_list = _wrapper->PostgreSqlFieldList();
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        std::wstring _field_list = _wrapper->FieldList();
         wcscpy_s(field_list, (_field_list.length() + 1), _field_list.c_str());
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlFieldList - called on already destroyed wrapper.");
@@ -284,9 +270,9 @@ void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list)
 }
 
 //
-// PostgresqlNumFields
+// NumFields
 //
-const int Mt4PostgreSqlWrapper::PostgreSqlNumFields()
+const int PostgreSql::NumFields()
 {
     return this->num_fields;
 }
@@ -294,8 +280,8 @@ const int Mt4PostgreSqlWrapper::PostgreSqlNumFields()
 const int DllPostgreSqlNumFields(const int wrapper)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        return _wrapper->PostgreSqlNumFields();
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->NumFields();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlNumFields - called on already destroyed wrapper.");
         return 0;
@@ -303,9 +289,9 @@ const int DllPostgreSqlNumFields(const int wrapper)
 }
 
 //
-// PostgresqlNumRows
+// NumRows
 //
-const int Mt4PostgreSqlWrapper::PostgreSqlNumRows()
+const int PostgreSql::NumRows()
 {
     return this->num_rows;
 }
@@ -313,8 +299,8 @@ const int Mt4PostgreSqlWrapper::PostgreSqlNumRows()
 const int DllPostgreSqlNumRows(const int wrapper)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        return _wrapper->PostgreSqlNumRows();
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->NumRows();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlNumRows - called on already destroyed wrapper.");
         return 0;
@@ -322,18 +308,18 @@ const int DllPostgreSqlNumRows(const int wrapper)
 }
 
 //
-// PostgreSqlQuery
+// Query
 //
-const bool Mt4PostgreSqlWrapper::PostgreSqlQuery(const std::wstring query)
+const bool PostgreSql::Query(const std::wstring query)
 {
     std::wstringstream log_message;
 
-    if (!this->PostgreSqlCheckConnection()) {
+    if (!this->CheckConnection()) {
         return false;
     }
 
     if (this->result != NULL) {
-        this->PostgreSqlClearResult();
+        this->ClearResult();
     }
 
     // TODO: use transactions
@@ -347,7 +333,7 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlQuery(const std::wstring query)
     {
         case PGRES_EMPTY_QUERY: {
             log_message << "ERROR: empty query";
-            this->PostgreSqlClearResult();
+            this->ClearResult();
             break;
         }
         case PGRES_COMMAND_OK: {
@@ -371,7 +357,7 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlQuery(const std::wstring query)
         case PGRES_NONFATAL_ERROR:
         case PGRES_FATAL_ERROR: {
             log_message << PQresultErrorMessage(this->result) << std::endl;
-            this->PostgreSqlClearResult();
+            this->ClearResult();
             this->WriteLog(log_message);
             return false;
         }
@@ -384,8 +370,8 @@ const bool Mt4PostgreSqlWrapper::PostgreSqlQuery(const std::wstring query)
 const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        return _wrapper->PostgreSqlQuery(query);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->Query(query);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlQuery - called on already destroyed wrapper.");
         return false;
@@ -393,9 +379,9 @@ const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query)
 }
 
 //
-// PostgreSqlServerVersion
+// ServerVersion
 //
-const int Mt4PostgreSqlWrapper::PostgreSqlServerVersion()
+const int PostgreSql::ServerVersion()
 {
     return PQserverVersion(this->connection);
 }
@@ -403,8 +389,8 @@ const int Mt4PostgreSqlWrapper::PostgreSqlServerVersion()
 const int DllPostgreSqlServerVersion(const int wrapper)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        return _wrapper->PostgreSqlServerVersion();
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->ServerVersion();
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlServerVersion - called on already destroyed wrapper.");
         return 0;
@@ -412,60 +398,20 @@ const int DllPostgreSqlServerVersion(const int wrapper)
 }
 
 //
-// WrapperLogFile
+// SetLogger
 //
-void Mt4PostgreSqlWrapper::WrapperLogFile(const std::string log_file)
+void PostgreSql::SetLogger(Logger * const logger)
 {
-    this->log_file = log_file;
+    this->logger = logger;
 }
 
-void DllWrapperLogFile(const int wrapper, const wchar_t * log_file)
+void DllPostgreSqlSetLogger(const int wrapper, const int logger)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        std::string _log_file;
-        UnicodeToAnsi(std::wstring(log_file), &_log_file);
-        _wrapper->WrapperLogFile(_log_file);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        _wrapper->SetLogger(GetLogger(logger));
     } catch (...) {
         FatalErrorMessageBox(L"DllWrapperLogFile - called on already destroyed wrapper.");
-    }
-}
-
-//
-// WrapperLogPrefix
-//
-void Mt4PostgreSqlWrapper::WrapperLogPrefix(const std::string log_prefix)
-{
-    this->log_prefix = log_prefix;
-}
-
-void DllWrapperLogPrefix(const int wrapper, const wchar_t * log_prefix)
-{
-    try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        std::string _log_prefix;
-        UnicodeToAnsi(std::wstring(log_prefix), &_log_prefix);
-        _wrapper->WrapperLogPrefix(_log_prefix);
-    } catch (...) {
-        FatalErrorMessageBox(L"DllWrapperLogPrefix - called on already destroyed wrapper.");
-    }
-}
-
-//
-// WrapperLogToStdout
-//
-void Mt4PostgreSqlWrapper::WrapperLogToStdout(const bool log_to_stdout)
-{
-    this->log_to_stdout = log_to_stdout;
-}
-
-void DllWrapperLogToStdout(const int wrapper, const bool log_to_stdout)
-{
-    try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
-        _wrapper->WrapperLogToStdout(log_to_stdout);
-    } catch (...) {
-        FatalErrorMessageBox(L"DllWrapperLogToStdout - called on already destroyed wrapper.");
     }
 }
 
@@ -480,60 +426,23 @@ const wchar_t * DllWrapperVersion()
 //
 // WriteLog
 //
-void Mt4PostgreSqlWrapper::WriteLog(std::wstringstream & log_message)
+void PostgreSql::WriteLog(std::wstringstream & log_message)
 {
-    std::string _log_message;
-    UnicodeToAnsi(log_message.str(), &_log_message);
-
-    SYSTEMTIME st;
-    std::stringstream timestamp;
-    std::stringstream formatted_message;
-    std::wstringstream error_message;
-    unsigned long bytes_writen;
-
-    GetLocalTime(&st);
-    timestamp << st.wYear << "-"
-        << std::setw(2) << std::setfill('0') << st.wMonth << "-"
-        << std::setw(2) << std::setfill('0') << st.wDay
-        << " "
-        << std::setw(2) << std::setfill('0') << st.wHour << ":"
-        << std::setw(2) << std::setfill('0') << st.wMinute << ":"
-        << std::setw(2) << std::setfill('0') << st.wSecond << "."
-        << std::setw(3) << std::setfill('0') << st.wMilliseconds;
-
-    formatted_message << timestamp.str() << " ";
-    if (!this->log_prefix.empty()) {
-        formatted_message << "[" << this->log_prefix << "] ";
+    if (this->logger != NULL) {
+        this->logger->WriteLog(log_message);
+    } else {
+        FatalErrorMessageBox(L"DllPostgreSqlWriteLog - no logger set.");
     }
-    formatted_message << _log_message << std::endl;
-
-    if (this->log_to_stdout) { std::cout << formatted_message.str(); }
-    
-    if (!this->log_file.empty()) {
-        HANDLE _log_file_handle = CreateFileA(
-            this->log_file.c_str(), FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL
-        );
-        if (_log_file_handle == INVALID_HANDLE_VALUE) {
-            error_message << "Cannot create file: " << this->log_file.c_str() << " (Error: " << GetLastError() << ")";
-            this->log_file = "";
-            FatalErrorMessageBox(error_message.str());
-        } else {
-            WriteFile(_log_file_handle, formatted_message.str().c_str(), strlen(formatted_message.str().c_str()), &bytes_writen, NULL);
-        }
-    }
-
-    log_message.str(L"");
-    return;
 }
 
-void DllWrapperWriteLog(const int wrapper, const wchar_t * const log_message)
+void DllPostgreSqlWriteLog(const int wrapper, const wchar_t * log_message)
 {
     try {
-        Mt4PostgreSqlWrapper * const _wrapper = GetMt4PostgreSqlWrapper(wrapper);
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _wrapper->WriteLog(_log_message);
+        _wrapper->WriteLog(_log_message);
     } catch (...) {
-        FatalErrorMessageBox(L"DllWrapperWriteLog - called on already destroyed wrapper.");
+        FatalErrorMessageBox(L"DllPostgreSqlWriteLog - called on already destroyed wrapper.");
     }
 }
