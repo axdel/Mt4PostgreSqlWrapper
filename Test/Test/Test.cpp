@@ -21,10 +21,6 @@ int wmain(int argc, wchar_t * argv[])
     const int wrapper = DllPostgreSqlInit(L"host=localhost user=bad_user dbname=bad_database", NULL);
     DllPostgreSqlClose(wrapper);
 
-    // CASE: USE NOT SET LOGGER
-    //std::wcout << std::endl << "CASE: USE NOT SET LOGGER" << std::endl;
-    //DllPostgreSqlWriteLog(wrapper, L"This should rise error");
-
     // CASE: WRITE LOG
     std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
     DllPostgreSqlWriteLog(wrapper, L"This is message from postgresql");  // wont print
@@ -203,10 +199,9 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW/FIELD" << std::endl;
     wchar_t * const field = new wchar_t[BUFFER_SIZE];
     DllPostgreSqlFetchField(wrapper, field, 100, 0);
+    std::wcout << "field[0] row[100] = " << field << std::endl;
     DllPostgreSqlFetchField(wrapper, field, 0, 100);
-    for (int i = 0; i < DllPostgreSqlNumFields(wrapper); i++) {
-        std::wcout << "field[" << i << "] = " << field[i] << std::endl;
-    }
+    std::wcout << "field[100] row[0] = " << field << std::endl;
 
     // CASE: FIELD LIST, FETCH ROW(S) ON CLEARED RESULT
     DllPostgreSqlClearResult(wrapper);
@@ -220,7 +215,7 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: FETCH ROW(S) ON CLEARED RESULT" << std::endl;
     for (int i = 0; i < DllPostgreSqlNumRows(wrapper); i++) {
         std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
-        for (int j = 0; j < num_fields; j++) {
+        for (int j = 0; j < DllPostgreSqlNumFields(wrapper); j++) {
             DllPostgreSqlFetchField(wrapper, row[j], i, j);
             std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
         }

@@ -208,6 +208,7 @@ const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, cons
         log_message << "ERROR: cannot fetch row: " << row_num << ", field: " << field_num;
         log_message << " (#rows:" << this->num_rows << ", #fields:" << this->num_fields << ")";
         this->WriteLog(log_message);
+        wcscpy_s(field, 4, L"N_A");
         return false;
     }
 
