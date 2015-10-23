@@ -28,7 +28,7 @@ delete logger;
 #property link      "https://github.com/axdel/Mt4PostgreSqlWrapper"
 #property strict
 
-#import "C:\\Users\\Administrator\\Dropbox\\Trading\\Dlls\\Mt4PostgreSqlWrapper\\Release\\Mt4PostgreSqlWrapper.dll"
+#import "Mt4PostgreSqlWrapper.dll"
     void DllLoggerDestroy(const int logger);
     const int DllLoggerInit(const string log_file, const string log_prefix);
     const int DllLoggerGetLogger(const int logger);
