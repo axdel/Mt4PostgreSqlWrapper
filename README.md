@@ -1,13 +1,11 @@
 # Mt4PostgreSqlWrapper
-PostgreSQL wrapper for MetaTrader4 (build >= 600)
+PostgreSQL wrapper for MetaTrader4 (build >= 600) with independed logger.
 
 ## MQL4 example use
 ```c++
-PostgreSql * psql = new PostgreSql();
 Logger * logger = new Logger("C:\\test.log", StringSubstr(Symbol(), 0, 6));
+PostgreSql * psql = new PostgreSql("host=localhost user=postgres dbname=test", logger.GetLogger());
 
-psql.SetLogger(logger.GetLogger());
-Print("connection = " + psql.Connect("host=localhost user=postgres dbname=test"));
 Print("query = " + psql.Query("SELECT * FROM _test_data_table"));
 Print("num_rows = " + psql.NumRows());
 Print("num_fields = " + psql.NumFields());
@@ -102,9 +100,9 @@ Logger::WriteLog(const string log_message)
 
 #include "Logger.mqh"
 
-#import "C:\\Users\\Administrator\\Dropbox\\Trading\\Dlls\\Mt4PostgreSqlWrapper\\Release\\Mt4PostgreSqlWrapper.dll"
+#import "Mt4PostgreSqlWrapper.dll"
     void DllPostgreSqlDestroy(const int wrapper);
-    const int DllPostgreSqlInit();
+    const int DllPostgreSqlInit(const string connection_string, const int logger);
     void DllPostgreSqlAffectedRows(const int wrapper, string & affected_rows);
     void DllPostgreSqlClearResult(const int wrapper);
     const int DllPostgreSqlClientVersion();
@@ -129,7 +127,7 @@ private:
     int wrapper;
     
 public:
-    PostgreSql();
+    PostgreSql(const string connection_string, const int logger = NULL);
     ~PostgreSql();
     
     void AffectedRows(string & affected_rows);
@@ -159,9 +157,9 @@ public:
 //
 // PostgreSql
 //
-PostgreSql::PostgreSql()
+PostgreSql::PostgreSql(const string connection_string, const int logger = NULL)
 {
-    this.wrapper = DllPostgreSqlInit();
+    this.wrapper = DllPostgreSqlInit(connection_string, logger);
 }
 
 //
