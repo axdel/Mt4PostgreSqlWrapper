@@ -187,7 +187,7 @@ DLLAPI void DllPostgreSqlClose(const int wrapper)
 //
 // FetchField
 //
-const bool PostgreSql::FetchField(wchar_t * field, const int row_num, const int field_num)
+const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, const int field_num)
 {
     std::wstringstream log_message;
     std::wstring _field;

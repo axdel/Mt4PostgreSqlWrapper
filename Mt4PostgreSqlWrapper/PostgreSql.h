@@ -42,7 +42,7 @@ public:
     const int ClientVersion();
     void Close();
     const bool Connect(const std::wstring connection_string);
-    const bool FetchField(wchar_t * field, const int row_num, const int field_num);
+    const bool FetchField(wchar_t * const field, const int row_num, const int field_num);
     const std::wstring FieldList();
     const int NumFields();
     const int NumRows();
@@ -73,7 +73,7 @@ DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion();
 DLLAPI void DllPostgreSqlClose(const int wrapper);
 DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string);
-DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * field, const int row_num, const int field_num);
+DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * const field, const int row_num, const int field_num);
 DLLAPI void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list);
 DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
