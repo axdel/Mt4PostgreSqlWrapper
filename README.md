@@ -1,6 +1,8 @@
 # Mt4PostgreSqlWrapper
 PostgreSQL wrapper for MetaTrader4 (build >= 600) with independed logger.
 
+Licence: http://www.wtfpl.net/txt/copying/
+
 ## MQL4 example use
 ```c++
 Logger * logger = new Logger("C:\\test.log", StringSubstr(Symbol(), 0, 6));
