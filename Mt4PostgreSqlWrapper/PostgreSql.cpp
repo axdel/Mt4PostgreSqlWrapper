@@ -9,11 +9,18 @@
 //
 // PostgreSqlInit
 //
-PostgreSql::PostgreSql() {}
-
-const int DllPostgreSqlInit()
+PostgreSql::PostgreSql(const std::wstring connection_string, Logger * const logger = NULL)
 {
-    return reinterpret_cast<const int>(new PostgreSql());
+    this->connection_string = connection_string;
+    this->logger = logger;
+    this->Connect(connection_string);
+}
+
+const int DllPostgreSqlInit(const wchar_t * const connection_string, const int logger = NULL)
+{
+    return reinterpret_cast<const int>(
+        new PostgreSql(connection_string, GetLogger(logger))
+    );
 }
 
 //

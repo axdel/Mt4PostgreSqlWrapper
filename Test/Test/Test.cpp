@@ -14,29 +14,27 @@ int wmain(int argc, wchar_t * argv[])
     std::wstring _test_data_table = L"_test_data_table";
     std::wstringstream query;
 
-    const int wrapper = DllPostgreSqlInit();
     const int logger = DllLoggerInit(L"C:\\test.log", L"EURUSD");
-
-    // CASE: USE NOT SET LOGGER
-    std::wcout << std::endl << "CASE: USE NOT SET LOGGER" << std::endl;
-    DllPostgreSqlWriteLog(wrapper, L"This should rise error");
-
-    DllPostgreSqlSetLogger(wrapper, logger);
 
     // CASE: UNSUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
-    DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database");
+    const int wrapper = DllPostgreSqlInit(L"host=localhost user=bad_user dbname=bad_database", NULL);
     DllPostgreSqlClose(wrapper);
+
+    // CASE: USE NOT SET LOGGER
+    //std::wcout << std::endl << "CASE: USE NOT SET LOGGER" << std::endl;
+    //DllPostgreSqlWriteLog(wrapper, L"This should rise error");
 
     // CASE: WRITE LOG
     std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
-    DllPostgreSqlWriteLog(wrapper, L"This is message from postgresql");
+    DllPostgreSqlWriteLog(wrapper, L"This is message from postgresql");  // wont print
     DllLoggerWriteLog(logger, L"This is message from logger");
-    DllPostgreSqlWriteLog(wrapper, L"This is again from postgresql");
 
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
     DllPostgreSqlConnect(wrapper, L"host=localhost user=postgres dbname=test");
+    DllPostgreSqlSetLogger(wrapper, logger);
+    DllPostgreSqlWriteLog(wrapper, L"This is again from postgresql");
 
     std::wcout << "client version = " << DllPostgreSqlClientVersion() << std::endl;
     std::wcout << "server version = " << DllPostgreSqlServerVersion(wrapper) << std::endl;

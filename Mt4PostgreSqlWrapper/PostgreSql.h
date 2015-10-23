@@ -12,9 +12,9 @@
 #include "Common.h"
 #include "Logger.h"
 
-const wchar_t WRAPPER_VERSION[] = L"0.1";
+const wchar_t WRAPPER_VERSION[] = L"1.0";
 
-const int MAX_RECONNECT_ATTEMPTS = 2;
+const int MAX_RECONNECT_ATTEMPTS = 3;
 const int SLEEP_RECONNECT_FAILED = 1000;
 
 class PostgreSql
@@ -34,7 +34,7 @@ private:
     const bool CheckConnection();
 
 public:
-    PostgreSql();
+    PostgreSql(const std::wstring connection_string, Logger * const logger);
     ~PostgreSql();
 
     const std::wstring AffectedRows();
@@ -63,11 +63,7 @@ namespace {
 // DLLAPI
 //
 DLLAPI void DllPostgreSqlDestroy(const int wrapper);
-DLLAPI const int DllPostgreSqlInit();
-
-DLLAPI void DllPostgreSqlSetLogger(const int wrapper, const int logger);
-DLLAPI void DllPostgreSqlWriteLog(const int wapper, const wchar_t * const log_message);
-
+DLLAPI const int DllPostgreSqlInit(const wchar_t * const connection_string, const int logger);
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion();
@@ -79,7 +75,8 @@ DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
 DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query);
 DLLAPI const int DllPostgreSqlServerVersion(const int wrapper);
-
+DLLAPI void DllPostgreSqlSetLogger(const int wrapper, const int logger);
+DLLAPI void DllPostgreSqlWriteLog(const int wapper, const wchar_t * const log_message);
 DLLAPI const wchar_t * DllPostgreSqlWrapperVersion();
 
 #endif
