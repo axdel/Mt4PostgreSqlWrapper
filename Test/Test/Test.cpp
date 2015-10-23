@@ -207,7 +207,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlFetchField(wrapper, field, 100, 0);
     DllPostgreSqlFetchField(wrapper, field, 0, 100);
     for (int i = 0; i < DllPostgreSqlNumFields(wrapper); i++) {
-        std::wcout << "field[" << i << "] = " << row[i] << std::endl;
+        std::wcout << "field[" << i << "] = " << field[i] << std::endl;
     }
 
     // CASE: FIELD LIST, FETCH ROW(S) ON CLEARED RESULT
@@ -223,7 +223,7 @@ int wmain(int argc, wchar_t * argv[])
     for (int i = 0; i < DllPostgreSqlNumRows(wrapper); i++) {
         std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
         for (int j = 0; j < num_fields; j++) {
-            DllPostgreSqlFetchField(wrapper, row[i], i, j);
+            DllPostgreSqlFetchField(wrapper, row[j], i, j);
             std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
         }
         std::wcout << std::endl;
