@@ -17,8 +17,10 @@ int wmain(int argc, wchar_t * argv[])
     const int wrapper = DllPostgreSqlInit();
     const int logger = DllLoggerInit(L"C:\\test.log", L"EURUSD");
 
-    // CASE: USE NO SET LOGGER
+    // CASE: USE NOT SET LOGGER
+    std::wcout << std::endl << "CASE: USE NOT SET LOGGER" << std::endl;
     DllPostgreSqlWriteLog(wrapper, L"This should rise error");
+
     DllPostgreSqlSetLogger(wrapper, logger);
 
     // CASE: UNSUCCESSFUL CONNECTION
@@ -199,6 +201,15 @@ int wmain(int argc, wchar_t * argv[])
         std::wcout << std::endl;
     }
 
+    // CASE: FETCH NON-EXISTENT ROW/FIELD
+    std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW/FIELD" << std::endl;
+    wchar_t * const field = new wchar_t[BUFFER_SIZE];
+    DllPostgreSqlFetchField(wrapper, field, 100, 0);
+    DllPostgreSqlFetchField(wrapper, field, 0, 100);
+    for (int i = 0; i < DllPostgreSqlNumFields(wrapper); i++) {
+        std::wcout << "field[" << i << "] = " << row[i] << std::endl;
+    }
+
     // CASE: FIELD LIST, FETCH ROW(S) ON CLEARED RESULT
     DllPostgreSqlClearResult(wrapper);
 
@@ -216,15 +227,6 @@ int wmain(int argc, wchar_t * argv[])
             std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
         }
         std::wcout << std::endl;
-    }
-
-    // CASE: FETCH NON-EXISTENT ROW/FIELD
-    std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW/FIELD" << std::endl;
-    wchar_t * const field = new wchar_t[BUFFER_SIZE];
-    DllPostgreSqlFetchField(wrapper, field, 100, 0);
-    DllPostgreSqlFetchField(wrapper, field, 0, 100);
-    for (int i = 0; i < DllPostgreSqlNumFields(wrapper); i++) {
-        std::wcout << "field[" << i << "] = " << row[i] << std::endl;
     }
 
     // CASE: CLOSE CONNECTION
