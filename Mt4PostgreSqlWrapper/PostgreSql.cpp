@@ -128,6 +128,7 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
         }
     } while (PQstatus(this->connection) == CONNECTION_BAD && --reconnect_attepts);
 
+	error_message << std::endl << "connection: " << connection_string;
     FatalErrorMessageBox(error_message.str());
     return false;
 }
