@@ -64,6 +64,25 @@ DLLAPI const int DllLoggerGetLogger(const int logger)
 }
 
 //
+// LogToStdout
+//
+void Logger::LogToStdout(const bool log_to_stdout)
+{
+	this->log_to_stdout = log_to_stdout;
+}
+
+DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout)
+{
+	try {
+		Logger * const _logger = GetLogger(logger);
+		_logger->LogToStdout(log_to_stdout);
+	}
+	catch (...) {
+		FatalErrorMessageBox(L"DllLoggerLogToStdout - called on already destroyed logger.");
+	}
+}
+
+//
 // WriteLog
 //
 void Logger::WriteLog(std::wstringstream & log_message)

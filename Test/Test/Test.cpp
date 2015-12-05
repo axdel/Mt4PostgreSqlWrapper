@@ -15,6 +15,7 @@ int wmain(int argc, wchar_t * argv[])
     std::wstringstream query;
 
     const int logger = DllLoggerInit(L"C:\\test.log", L"EURUSD");
+	DllLoggerLogToStdout(logger, true);
 
     // CASE: UNSUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
@@ -28,7 +29,7 @@ int wmain(int argc, wchar_t * argv[])
 
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
-    DllPostgreSqlConnect(wrapper, L"host=localhost user=postgres dbname=test");
+    DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
     DllPostgreSqlSetLogger(wrapper, logger);
     DllPostgreSqlWriteLog(wrapper, L"This is again from postgresql");
 
