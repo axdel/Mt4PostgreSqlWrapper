@@ -85,7 +85,7 @@ DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout)
 //
 // WriteLog
 //
-void Logger::WriteLog(std::wstringstream & log_message)
+void Logger::WriteLog(std::wstringstream & log_message, const bool message_box)
 {
     std::string _log_message;
     UnicodeToAnsi(log_message.str(), &_log_message);
@@ -116,18 +116,23 @@ void Logger::WriteLog(std::wstringstream & log_message)
     if (this->log_file_handle != NULL) {
         WriteFile(this->log_file_handle, formatted_message.str().c_str(), strlen(formatted_message.str().c_str()), &bytes_writen, NULL);
     }
+	if (message_box == true) {
+		std::wstring _formatted_message;
+		AnsiToUnicode(formatted_message.str(), &_formatted_message);
+		WindowsMessageBox(_formatted_message, L"Logger", MB_ICONWARNING | MB_OK);
+	}
     
     log_message.str(L"");
     return;
 }
 
-DLLAPI void DllLoggerWriteLog(const int logger, const wchar_t * const log_message)
+DLLAPI void DllLoggerWriteLog(const int logger, const wchar_t * const log_message, const bool message_box)
 {
     try {
         Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _logger->WriteLog(_log_message);
+        return _logger->WriteLog(_log_message, message_box);
     } catch (...) {
         FatalErrorMessageBox(L"DllLoggerWriteLog - called on already destroyed logger.");
     }

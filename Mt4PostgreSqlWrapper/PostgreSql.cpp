@@ -207,7 +207,7 @@ const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, cons
     }
     if ((row_num + 1) > this->num_rows || (field_num + 1) > this->num_fields) {
         log_message << "ERROR: cannot fetch row: " << row_num << ", field: " << field_num;
-        log_message << " (#rows:" << this->num_rows << ", #fields:" << this->num_fields << ")";
+        log_message << " (rows:" << this->num_rows << ", fields:" << this->num_fields << ")";
         this->WriteLog(log_message);
         wcscpy_s(field, 4, L"N_A");
         return false;
@@ -219,7 +219,7 @@ const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, cons
     } else {
         wcscpy_s(field, 5, L"NULL");
     }
-
+	
     return true;
 }
 

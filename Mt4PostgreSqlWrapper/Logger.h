@@ -26,7 +26,7 @@ public:
     
     const int GetLogger();
 	void LogToStdout(const bool log_to_stdout);
-    void WriteLog(std::wstringstream & log_message);
+    void WriteLog(std::wstringstream & log_message, const bool message_box = false);
 };
 
 namespace {
@@ -42,6 +42,6 @@ DLLAPI void DllLoggerDestroy(const int logger);
 DLLAPI const int DllLoggerInit(const wchar_t * const log_file, const wchar_t * const log_prefix);
 DLLAPI const int DllLoggerGetLogger(const int logger);
 DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout);
-DLLAPI void DllLoggerWriteLog(const int logger, const wchar_t * const log_message);
+DLLAPI void DllLoggerWriteLog(const int logger, const wchar_t * const log_message, const bool message_box = false);
 
 #endif
