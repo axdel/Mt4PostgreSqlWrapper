@@ -5,19 +5,29 @@ Licence: http://www.wtfpl.net/txt/copying/
 
 ## MQL4 example use
 ```c++
-Logger * logger = new Logger("C:\\test.log", StringSubstr(Symbol(), 0, 6));
-PostgreSql * psql = new PostgreSql("host=localhost user=postgres dbname=test", logger.GetLogger());
+#property strict
 
-Print("query = " + psql.Query("SELECT * FROM _test_data_table"));
-Print("num_rows = " + psql.NumRows());
-Print("num_fields = " + psql.NumFields());
-string fields[];
-Print("fetchrow = " + psql.FetchRow(fields, 0));
-for (int i = 0; i < psql.NumFields(); i++)
-    Print("field[" + i + "] = " + field[i]);
+#include <Logger.mqh>
+#include <Postgresql.mqh>
 
-delete psql;
-delete logger;
+void OnStart()
+{
+    Logger * logger = new Logger("C:\\test.log", "[" + Symbol() + "]");
+    logger.Info("logger & message box test...", true);
+    
+    PostgreSql * psql = new PostgreSql("host=localhost user=test dbname=test", logger);
+    
+    Print("query = " + psql.Query("SELECT * FROM _test_data_table"));
+    Print("num_rows = " + psql.NumRows());
+    Print("num_fields = " + psql.NumFields());
+    string fields[];
+    Print("fetchrow = " + psql.FetchRow(fields, 0));
+    for (int i = 0; i < psql.NumFields(); i++)
+       Print("field[" + i + "] = " + fields[i]);
+    
+    delete psql;
+    delete logger;
+}
 ```
 
 ## MQL4 example implementation
@@ -34,60 +44,48 @@ delete logger;
     void DllLoggerDestroy(const int logger);
     const int DllLoggerInit(const string log_file, const string log_prefix);
     const int DllLoggerGetLogger(const int logger);
-    void DllLoggerWriteLog(const int logger, const string log_message);
+    void DllLoggerDebug(const int logger, const string log_message, const bool message_box);
+    void DllLoggerInfo(const int logger, const string log_message, const bool message_box);
+    void DllLoggerWarning(const int logger, const string log_message, const bool message_box);
+    void DllLoggerError(const int logger, const string log_message, const bool message_box);
+    void DllLoggerCritical(const int logger, const string log_message, const bool message_box);
 #import
+
+#include <Common.mqh>
 
 class Logger
 {
 private:
     int logger;
-    
+
 public:
-    Logger(const string log_file, const string log_prefix = "");
-    ~Logger();
+    Logger(const string log_file, const string log_prefix = "") {
+        this.logger = DllLoggerInit(log_file, log_prefix);
+    }
+    ~Logger() {
+        DllLoggerDestroy(this.logger);
+    }
+
+    const int GetLogger() {
+        return DllLoggerGetLogger(this.logger);
+    }
     
-    const int GetLogger();
-    
-    void Debug(const string log_message) { this.WriteLog("DEBUG: " + log_message); }
-    void Info(const string log_message) { this.WriteLog("INFO: " + log_message); }
-    void Warning(const string log_message) { this.WriteLog("WARNING: " + log_message); }
-    void Error(const string log_message) { this.WriteLog("ERROR: " + log_message); }
-    void Critical(const string log_message) { this.WriteLog("CRITICAL: " + log_message); }
-    
-    void WriteLog(const string log_message);
+    void Debug(const string log_message, const bool message_box = false) {
+        DllLoggerDebug(this.logger, log_message, message_box);
+    }
+    void Info(const string log_message, const bool message_box = false) {
+        DllLoggerInfo(this.logger, log_message, message_box);
+    }
+    void Warning(const string log_message, const bool message_box = false) {
+        DllLoggerWarning(this.logger, log_message, message_box);
+    }
+    void Error(const string log_message, const bool message_box = false) {
+        DllLoggerError(this.logger, log_message, message_box);
+    }
+    void Critical(const string log_message, const bool message_box = false) {
+        DllLoggerCritical(this.logger, log_message, message_box);
+    }
 };
-
-//
-// Logger
-//
-Logger::Logger(const string log_file, const string log_prefix = "")
-{
-    this.logger = DllLoggerInit(log_file, log_prefix);
-}
-
-//
-// ~Logger
-//
-Logger::~Logger()
-{
-    DllLoggerDestroy(this.logger);
-}
-
-//
-// GetLogger
-//
-const int Logger::GetLogger()
-{
-    return DllLoggerGetLogger(this.logger);
-}
-
-//
-// WriteLog
-//
-Logger::WriteLog(const string log_message)
-{
-    DllLoggerWriteLog(this.logger, log_message);
-}
 ```
 
 ### PostgreSql.mqh
@@ -99,8 +97,6 @@ Logger::WriteLog(const string log_message)
 #property copyright "axdel"
 #property link      "https://github.com/axdel/Mt4PostgreSqlWrapper"
 #property strict
-
-#include "Logger.mqh"
 
 #import "Mt4PostgreSqlWrapper.dll"
     void DllPostgreSqlDestroy(const int wrapper);
@@ -117,9 +113,11 @@ Logger::WriteLog(const string log_message)
     const bool DllPostgreSqlQuery(const int wrapper, const string query);
     const int DllPostgreSqlServerVersion(const int wrapper);
     void DllPostgreSqlSetLogger(const int wrapper, const int logger);
-    void DllPostgreSqlWriteLog(const int wapper, const string log_message);
     const string DllPostgreSqlWrapperVersion();
 #import
+
+#include <Common.mqh>
+#include <Logger.mqh>
 
 const int BUFFER_SIZE = 1024;
 
@@ -127,11 +125,13 @@ class PostgreSql
 {
 private:
     int wrapper;
+    Logger * logger;
     
 public:
-    PostgreSql(const string connection_string, const int logger = NULL);
+
+    PostgreSql(const string connection_string, Logger * _logger);
     ~PostgreSql();
-    
+
     void AffectedRows(string & affected_rows);
     void ClearResult();
     const int ClientVersion();
@@ -144,24 +144,16 @@ public:
     const int NumRows();
     const bool Query(string query);
     const int ServerVersion();
-    
-    void SetLogger(const int logger);
-    void Debug(const string log_message) { this.WriteLog("DEBUG: " + log_message); }
-    void Info(const string log_message) { this.WriteLog("INFO: " + log_message); }
-    void Warning(const string log_message) { this.WriteLog("WARNING: " + log_message); }
-    void Error(const string log_message) { this.WriteLog("ERROR: " + log_message); }
-    void Critical(const string log_message) { this.WriteLog("CRITICAL: " + log_message); }
-    void WriteLog(const string message);
-    
     const string WrapperVersion();
 };
 
 //
 // PostgreSql
 //
-PostgreSql::PostgreSql(const string connection_string, const int logger = NULL)
+PostgreSql::PostgreSql(const string connection_string, Logger * _logger)
 {
-    this.wrapper = DllPostgreSqlInit(connection_string, logger);
+    this.logger = _logger;
+    this.wrapper = DllPostgreSqlInit(connection_string, this.logger.GetLogger());
 }
 
 //
@@ -169,6 +161,7 @@ PostgreSql::PostgreSql(const string connection_string, const int logger = NULL)
 //
 PostgreSql::~PostgreSql()
 {
+    delete(this.logger);
     DllPostgreSqlDestroy(this.wrapper);
 }
 
@@ -226,18 +219,25 @@ const bool PostgreSql::FetchField(string & field, const int row_num, const int f
 //
 const bool PostgreSql::FetchRow(string & row[], const int row_num)
 {
-    bool fetch_successful = true;
     int num_fields = this.NumFields();
+    if (num_fields == 0) {
+        return false;
+    }
+ 
+    bool message_box = false;
+    if (DEBUG) { message_box = true; }
+    
     if (ArrayResize(row, num_fields) == num_fields) {
-        this.WriteLog("Fetching row: " + row_num);
+        this.logger.Debug("fetching row: " + row_num);
         for (int i = 0; i < num_fields; i++) {
             if (!this.FetchField(row[i], row_num, i)) {
-                fetch_successful = false;
+                this.logger.Error("cannot fetch row: " + row_num + " field: " + i, message_box);
+                return false;
             }
         }
-        return fetch_successful;
+        return true;
     } else {
-        this.Error("Cannot resize array (Error code:" + GetLastError()+ ")");
+        this.logger.Error("cannot resize array (error code:" + GetLastError()+ ")", message_box);
         return false;
     }
 }
@@ -289,21 +289,5 @@ const int PostgreSql::ServerVersion()
 const string PostgreSql::WrapperVersion()
 {
     return DllPostgreSqlWrapperVersion();
-}
-
-//
-// WriteLog
-//
-void PostgreSql::WriteLog(const string log_message)
-{
-    DllPostgreSqlWriteLog(this.wrapper, log_message);
-}
-
-//
-// SetLogger
-//
-void PostgreSql::SetLogger(const int logger)
-{
-    DllPostgreSqlSetLogger(this.wrapper, logger);
 }
 ```
