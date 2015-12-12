@@ -48,9 +48,6 @@ public:
     const int NumRows();
     const bool Query(const std::wstring query);
     const int ServerVersion();
-
-    void SetLogger(Logger * const logger);
-    void WriteLog(std::wstringstream & log_message);
 };
 
 namespace {
@@ -75,8 +72,6 @@ DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
 DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query);
 DLLAPI const int DllPostgreSqlServerVersion(const int wrapper);
-DLLAPI void DllPostgreSqlSetLogger(const int wrapper, const int logger);
-DLLAPI void DllPostgreSqlWriteLog(const int wapper, const wchar_t * const log_message);
 DLLAPI const wchar_t * DllPostgreSqlWrapperVersion();
 
 #endif

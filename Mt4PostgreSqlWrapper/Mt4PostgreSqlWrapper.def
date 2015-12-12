@@ -2,8 +2,6 @@ LIBRARY	"Mt4PostgreSqlWrapper"
 EXPORTS
 DllPostgreSqlDestroy
 DllPostgreSqlInit
-DllPostgreSqlSetLogger
-DllPostgreSqlWriteLog
 DllPostgreSqlAffectedRows
 DllPostgreSqlClearResult
 DllPostgreSqlClientVersion
@@ -19,4 +17,8 @@ DllPostgreSqlWrapperVersion
 DllLoggerDestroy
 DllLoggerInit
 DllLoggerGetLogger
-DllLoggerWriteLog
+DllLoggerDebug
+DllLoggerInfo
+DllLoggerWarning
+DllLoggerError
+DllLoggerCritical
