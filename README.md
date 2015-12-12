@@ -51,8 +51,6 @@ void OnStart()
     void DllLoggerCritical(const int logger, const string log_message, const bool message_box);
 #import
 
-#include <Common.mqh>
-
 class Logger
 {
 private:
