@@ -15,7 +15,8 @@ void OnStart()
     Logger * logger = new Logger("C:\\test.log", "[" + Symbol() + "]");
     logger.Info("logger & message box test...", true);
     
-    PostgreSql * psql = new PostgreSql("host=localhost user=test dbname=test", logger);
+    PostgreSql * psql = new PostgreSql(logger);
+    psql.Connect("host=localhost user=test dbname=test");
     
     Print("query = " + psql.Query("SELECT * FROM _test_data_table"));
     Print("num_rows = " + psql.NumRows());
