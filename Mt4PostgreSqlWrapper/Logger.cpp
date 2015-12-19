@@ -64,6 +64,25 @@ DLLAPI const int DllLoggerGetLogger(const int logger)
 }
 
 //
+// LogDebug
+//
+void Logger::LogDebug(const bool log_debug)
+{
+	this->log_debug = log_debug;
+}
+
+DLLAPI void DllLoggerLogDebug(const int logger, const bool log_debug)
+{
+	try {
+		Logger * const _logger = GetLogger(logger);
+		_logger->LogDebug(log_debug);
+	}
+	catch (...) {
+		FatalErrorMessageBox(L"DllLoggerLogDebug - called on already destroyed logger.");
+	}
+}
+
+//
 // LogToStdout
 //
 void Logger::LogToStdout(const bool log_to_stdout)
@@ -87,7 +106,9 @@ DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout)
 //
 void Logger::Debug(std::wstringstream & log_message, const bool message_box)
 {
-	this->WriteLog(log_message, L"DEBUG", message_box);
+	if (this->log_debug) {
+		this->WriteLog(log_message, L"DEBUG", message_box);
+	}
 }
 
 DLLAPI void DllLoggerDebug(const int logger, const wchar_t * const log_message, const bool message_box)

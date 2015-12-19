@@ -18,6 +18,7 @@ private:
 
 	HANDLE log_file_handle = NULL;
     
+	bool log_debug = false;
 	bool log_to_stdout = false;
 
 	void WriteLog(std::wstringstream & log_message, const std::wstring log_level, const bool message_box = false);
@@ -27,6 +28,7 @@ public:
     ~Logger();
     
     const int GetLogger();
+	void LogDebug(const bool log_debug);
 	void LogToStdout(const bool log_to_stdout);
 
 	void Debug(std::wstringstream & log_message, const bool message_box = false);
@@ -48,6 +50,7 @@ namespace {
 DLLAPI void DllLoggerDestroy(const int logger);
 DLLAPI const int DllLoggerInit(const wchar_t * const log_file, const wchar_t * const log_prefix);
 DLLAPI const int DllLoggerGetLogger(const int logger);
+DLLAPI void DllLoggerLogDebug(const int logger, const bool log_debug);
 DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout);
 DLLAPI void DllLoggerDebug(const int logger, const wchar_t * const log_message, const bool message_box = false);
 DLLAPI void DllLoggerInfo(const int logger, const wchar_t * const log_message, const bool message_box = false);
