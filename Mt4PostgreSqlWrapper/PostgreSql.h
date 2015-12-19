@@ -34,7 +34,7 @@ private:
     const bool CheckConnection();
 
 public:
-    PostgreSql(const std::wstring connection_string, Logger * const logger);
+    PostgreSql(Logger * const logger);
     ~PostgreSql();
 
     const std::wstring AffectedRows();
@@ -60,7 +60,7 @@ namespace {
 // DLLAPI
 //
 DLLAPI void DllPostgreSqlDestroy(const int wrapper);
-DLLAPI const int DllPostgreSqlInit(const wchar_t * const connection_string, const int logger);
+DLLAPI const int DllPostgreSqlInit(const int logger);
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion();

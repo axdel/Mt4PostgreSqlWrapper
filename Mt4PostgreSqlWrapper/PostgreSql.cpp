@@ -9,21 +9,19 @@
 //
 // PostgreSqlInit
 //
-PostgreSql::PostgreSql(const std::wstring connection_string, Logger * const logger)
+PostgreSql::PostgreSql(Logger * const logger)
 {
 	std::wstringstream log_message;
-	log_message << "postgresql wrapper created [w:" << this << "]";
-    
-	this->connection_string = connection_string;
+	log_message << "PostgreSQL wrapper created [w:" << this << "]";
+
     this->logger = logger;
 	this->logger->Info(log_message);
-    this->Connect(connection_string);
 }
 
-const int DllPostgreSqlInit(const wchar_t * const connection_string, const int logger)
+const int DllPostgreSqlInit(const int logger)
 {
     return reinterpret_cast<const int>(
-        new PostgreSql(connection_string, GetLogger(logger))
+        new PostgreSql(GetLogger(logger))
     );
 }
 
@@ -33,7 +31,7 @@ const int DllPostgreSqlInit(const wchar_t * const connection_string, const int l
 PostgreSql::~PostgreSql()
 {
 	std::wstringstream log_message;
-	log_message << "postgresql wrapper destroyed [w:" << this << "]";
+	log_message << "PostgreSQL wrapper destroyed [w:" << this << "]";
 	this->logger->Info(log_message);
 }
 
@@ -41,6 +39,7 @@ DLLAPI void DllPostgreSqlDestroy(const int wrapper)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+		_wrapper->Close();
         delete _wrapper;
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlWrapperDestroy - called on already destroyed wrapper.");
@@ -73,7 +72,7 @@ void PostgreSql::ClearResult()
 {
     std::wstringstream log_message;
 
-    log_message << "clearing result... ";
+    log_message << "Clearing result... ";
     if (this->result != NULL) {
         PQclear(this->result);
         this->result = NULL;
@@ -112,15 +111,15 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
 {
     std::wstringstream log_message;
     std::wstringstream error_message;
-    error_message << "unable to connect to database (repeatedly), logged error(s):\n\n";
-    
-    this->connection_string = connection_string;
+    error_message << "Unable to connect to database (repeatedly), logged error(s):\n\n";
+
+	this->connection_string = connection_string;
 	UnicodeToAnsi(connection_string, &this->_connection_string);
 
     int reconnect_attepts = MAX_RECONNECT_ATTEMPTS;
     do {
         int i = (MAX_RECONNECT_ATTEMPTS-reconnect_attepts) + 1;
-        log_message << "opening database connection (attempt:" << i << ") ... ";
+        log_message << "Opening database connection (attempt:" << i << ") ... ";
         this->connection = PQconnectdb(this->_connection_string.c_str());
         if (PQstatus(this->connection) == CONNECTION_OK) {
             log_message << "opened [c:" << this->connection << ", w:" << this << "]";
@@ -158,11 +157,16 @@ const bool PostgreSql::CheckConnection()
 {
     std::wstringstream log_message;
 
+	if (this->connection_string.empty()) {
+		log_message << "Cannot connect, connection string is empty (Connect(...) not called?)";
+		this->logger->Error(log_message);
+		return false;
+	}
     if (PQstatus(this->connection) == CONNECTION_OK) {
         return true;
     }
 
-    log_message << "connection closed, trying to reconnect...";
+    log_message << "Connection closed, trying to reconnect...";
     this->logger->Error(log_message);
 
     this->Close();
@@ -176,7 +180,7 @@ void PostgreSql::Close()
 {
     std::wstringstream log_message;
 
-    log_message << "closing connection [c:" << this->connection << ", w:" << this << "] ... ";
+    log_message << "Closing connection [c:" << this->connection << ", w:" << this << "] ... ";
     if (this->connection != NULL) {
         PQfinish(this->connection);
         this->connection = NULL;
@@ -208,14 +212,14 @@ const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, cons
     std::wstring _field;
 
     if (this->result == NULL) {
-		log_message << "cannot fetch row: " << row_num << ", field: " << field_num;
-        log_message << " - no active result found (probably cleared?)";
+		log_message << "Cannot fetch row: " << row_num << ", field: " << field_num;
+        log_message << ", no active result found (probably cleared?)";
         this->logger->Error(log_message);
         return false;
     }
     if ((row_num + 1) > this->num_rows || (field_num + 1) > this->num_fields) {
-        log_message << "cannot fetch row: " << row_num << ", field: " << field_num;
-        log_message << " - rows:" << this->num_rows << ", fields:" << this->num_fields;
+        log_message << "Cannot fetch row: " << row_num << ", field: " << field_num;
+        log_message << ", rows:" << this->num_rows << ", fields:" << this->num_fields;
         this->logger->Error(log_message);
         wcscpy_s(field, 4, L"N_A");
         return false;
@@ -251,7 +255,7 @@ const std::wstring PostgreSql::FieldList()
     std::wstringstream field_list;
 
     if (this->result == NULL) {
-        log_message << "cannot get field list - no active result found (probably cleared?)";
+        log_message << "Cannot get field list - no active result found (probably cleared?)";
         this->logger->Error(log_message);
         return L"";
     }
@@ -260,7 +264,7 @@ const std::wstring PostgreSql::FieldList()
         field_list << "\"" << PQfname(this->result, i) << "\" ";
     }
 
-    log_message << "field list: " << field_list.str();
+    log_message << "Field list: " << field_list.str();
     this->logger->Debug(log_message);
 
     return field_list.str();
@@ -328,7 +332,7 @@ const bool PostgreSql::Query(const std::wstring query)
 
     if (this->result != NULL) {
         this->ClearResult();
-		log_message << "uncleared result before new query";
+		log_message << "Uncleared result before new query";
 		this->logger->Warning(log_message);
     }
 
@@ -355,7 +359,7 @@ const bool PostgreSql::Query(const std::wstring query)
             if (!this->affected_rows.empty()) {
                 log_message << this->affected_rows << " affected row(s)";
             } else {
-				log_message << "nothing returned";
+				log_message << "Nothing returned";
             }
 			this->logger->Debug(log_message);
             // clear result manualy
@@ -364,7 +368,7 @@ const bool PostgreSql::Query(const std::wstring query)
         case PGRES_TUPLES_OK: {
             this->num_rows = PQntuples(this->result);
             this->num_fields = PQnfields(this->result);
-			log_message << "returned " << this->num_rows << " rows, " << this->num_fields << " fields";
+			log_message << "Returned " << this->num_rows << " rows, " << this->num_fields << " fields";
 			this->logger->Debug(log_message);
             // clear result manualy
             break;
