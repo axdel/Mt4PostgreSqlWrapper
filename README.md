@@ -15,7 +15,8 @@ void OnStart()
     Logger * logger = new Logger("C:\\test.log", "[" + Symbol() + "]");
     logger.Info("logger & message box test...", true);
     
-    PostgreSql * psql = new PostgreSql("host=localhost user=test dbname=test", logger);
+    PostgreSql * psql = new PostgreSql(logger);
+    psql.Connect("host=localhost user=test dbname=test");
     
     Print("query = " + psql.Query("SELECT * FROM _test_data_table"));
     Print("num_rows = " + psql.NumRows());
@@ -96,9 +97,9 @@ public:
 #property link      "https://github.com/axdel/Mt4PostgreSqlWrapper"
 #property strict
 
-#import "Mt4PostgreSqlWrapper.dll"
+#import "C:\\Users\\Administrator\\Dropbox\\Trading\\Dlls\\Mt4PostgreSqlWrapper\\Release\\Mt4PostgreSqlWrapper.dll"
     void DllPostgreSqlDestroy(const int wrapper);
-    const int DllPostgreSqlInit(const string connection_string, const int logger);
+    const int DllPostgreSqlInit(const int logger);
     void DllPostgreSqlAffectedRows(const int wrapper, string & affected_rows);
     void DllPostgreSqlClearResult(const int wrapper);
     const int DllPostgreSqlClientVersion();
@@ -114,6 +115,7 @@ public:
     const string DllPostgreSqlWrapperVersion();
 #import
 
+#include <Common.mqh>
 #include <Logger.mqh>
 
 const int BUFFER_SIZE = 1024;
@@ -126,7 +128,7 @@ private:
     
 public:
 
-    PostgreSql(const string connection_string, Logger * _logger);
+    PostgreSql(Logger * _logger);
     ~PostgreSql();
 
     void AffectedRows(string & affected_rows);
@@ -147,10 +149,10 @@ public:
 //
 // PostgreSql
 //
-PostgreSql::PostgreSql(const string connection_string, Logger * _logger)
+PostgreSql::PostgreSql(Logger * _logger)
 {
     this.logger = _logger;
-    this.wrapper = DllPostgreSqlInit(connection_string, this.logger.GetLogger());
+    this.wrapper = DllPostgreSqlInit(this.logger.GetLogger());
 }
 
 //
@@ -158,7 +160,7 @@ PostgreSql::PostgreSql(const string connection_string, Logger * _logger)
 //
 PostgreSql::~PostgreSql()
 {
-    delete(this.logger);
+    this.Close();
     DllPostgreSqlDestroy(this.wrapper);
 }
 
@@ -191,6 +193,7 @@ const int PostgreSql::ClientVersion()
 //
 void PostgreSql::Close()
 {
+    Print("Closing database connection");
     DllPostgreSqlClose(this.wrapper);
 }
 
@@ -199,6 +202,7 @@ void PostgreSql::Close()
 //
 const bool PostgreSql::Connect(const string connection_string)
 {
+    Print("Opening database connection");
     return DllPostgreSqlConnect(this.wrapper, connection_string);
 }
 
