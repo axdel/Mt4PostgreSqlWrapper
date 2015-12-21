@@ -4,6 +4,8 @@
 #include <iostream>
 #include <Windows.h>
 
+const wchar_t WRAPPER_VERSION[] = L"2015.12.21";
+
 namespace {
     inline void AnsiToUnicode(const std::string & in, std::wstring * const out) {
         out->assign(in.begin(), in.end()); 

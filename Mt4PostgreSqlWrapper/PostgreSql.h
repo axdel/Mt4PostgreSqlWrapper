@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <regex>
 #include <sstream>
 
 #define WIN32_LEAN_AND_MEAN
@@ -11,8 +12,6 @@
 #include "libpq-fe.h"
 #include "Common.h"
 #include "Logger.h"
-
-const wchar_t WRAPPER_VERSION[] = L"1.0";
 
 const int MAX_RECONNECT_ATTEMPTS = 3;
 const int SLEEP_RECONNECT_FAILED = 1000;
@@ -46,7 +45,7 @@ public:
     const std::wstring FieldList();
     const int NumFields();
     const int NumRows();
-    const bool Query(const std::wstring query);
+	const bool Query(const std::wstring query, const bool silence_conflict = false);
     const int ServerVersion();
 };
 
@@ -63,14 +62,14 @@ DLLAPI void DllPostgreSqlDestroy(const int wrapper);
 DLLAPI const int DllPostgreSqlInit(const int logger);
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
-DLLAPI const int DllPostgreSqlClientVersion();
+DLLAPI const int DllPostgreSqlClientVersion(const int wrapper);
 DLLAPI void DllPostgreSqlClose(const int wrapper);
 DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string);
 DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * const field, const int row_num, const int field_num);
 DLLAPI void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list);
 DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
-DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query);
+DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query, const bool silence_conflict = false);
 DLLAPI const int DllPostgreSqlServerVersion(const int wrapper);
 DLLAPI const wchar_t * DllPostgreSqlWrapperVersion();
 

@@ -99,9 +99,21 @@ DLLAPI void DllPostgreSqlClearResult(const int wrapper)
 //
 // ClientVersion
 //
-DLLAPI const int DllPostgreSqlClientVersion()
+const int PostgreSql::ClientVersion()
 {
-    return PQlibVersion();
+	return PQlibVersion();
+}
+
+DLLAPI const int DllPostgreSqlClientVersion(const int wrapper)
+{
+	try {
+		PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+		return _wrapper->ClientVersion();
+	}
+	catch (...) {
+		FatalErrorMessageBox(L"DllPostgreSqlClientVersion - called on already destroyed wrapper.");
+		return false;
+	}
 }
 
 //
@@ -124,6 +136,8 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
         if (PQstatus(this->connection) == CONNECTION_OK) {
             log_message << "opened [c:" << this->connection << ", w:" << this << "]";
             this->logger->Info(log_message);
+			log_message << "PostgreSQL version client:" << this->ClientVersion() << ", server:" << this->ServerVersion() << ", wrapper:" << WRAPPER_VERSION;
+			this->logger->Info(log_message);
             return true;
         } else {
             log_message << "failed [c:" << this->connection << ", w:" << this << "]" << std::endl << PQerrorMessage(this->connection);
@@ -322,9 +336,10 @@ DLLAPI const int DllPostgreSqlNumRows(const int wrapper)
 //
 // Query
 //
-const bool PostgreSql::Query(const std::wstring query)
+const bool PostgreSql::Query(const std::wstring query, const bool silence_conflict)
 {
     std::wstringstream log_message;
+	std::regex duplicate_key("duplicate key value");  // temporary until PostrgeSQL 9.5 ON CONFLICT DO NOTHING
 
     if (!this->CheckConnection()) {
         return false;
@@ -376,9 +391,16 @@ const bool PostgreSql::Query(const std::wstring query)
         case PGRES_BAD_RESPONSE:
         case PGRES_NONFATAL_ERROR:
         case PGRES_FATAL_ERROR: {
-			log_message << PQresultErrorMessage(this->result) << std::endl;
-            this->ClearResult();
-            this->logger->Critical(log_message);
+			std::string result_error = PQresultErrorMessage(this->result);
+			if (silence_conflict && std::regex_search(result_error, duplicate_key)) {
+				log_message << "Conflict silenced (duplicate key)";
+				this->logger->Debug(log_message);
+			}
+			else {
+				log_message << result_error.c_str();
+				this->logger->Critical(log_message);
+			}
+			this->ClearResult();
             return false;
         }
     }
@@ -386,11 +408,11 @@ const bool PostgreSql::Query(const std::wstring query)
     return true;
 }
 
-DLLAPI const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query)
+DLLAPI const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query, const bool silence_conflict)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
-        return _wrapper->Query(query);
+		return _wrapper->Query(query, silence_conflict);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlQuery - called on already destroyed wrapper.");
         return false;
