@@ -15,12 +15,12 @@ namespace {
         out->assign(in.begin(), in.end());
     }
 
-	inline void WindowsMessageBox(const std::wstring & message, const std::wstring & title, const UINT type) {
-		MessageBoxW(NULL, message.c_str(), title.c_str(), type);
-	}
+    inline void WindowsMessageBox(const std::wstring & message, const std::wstring & title, const UINT type) {
+        MessageBoxW(NULL, message.c_str(), title.c_str(), type);
+    }
 
     inline void FatalErrorMessageBox(const std::wstring & message) {
-		WindowsMessageBox(message.c_str(), L"Fatal Error", MB_ICONERROR | MB_OK);
+        WindowsMessageBox(message.c_str(), L"Fatal Error", MB_ICONERROR | MB_OK);
     }
 }
 

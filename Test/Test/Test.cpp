@@ -15,29 +15,29 @@ int wmain(int argc, wchar_t * argv[])
     std::wstringstream query;
 
     const int logger = DllLoggerInit(L"C:\\Logs\\dll-test.log", L"[wrapper]");
-	DllLoggerLogToStdout(logger, true);
-	DllLoggerLogDebug(logger, true);
+    DllLoggerLogToStdout(logger, true);
+    DllLoggerLogDebug(logger, true);
 
-	const int wrapper = DllPostgreSqlInit(logger);
+    const int wrapper = DllPostgreSqlInit(logger);
 
-	// CASE: QUERY ON UNKNOWN DATABASE
+    // CASE: QUERY ON UNKNOWN DATABASE
     std::wcout << std::endl << "CASE: QUERY ON UNKNOWN DATABASE" << std::endl;
-	DllPostgreSqlQuery(wrapper, L"SELECT 1");
+    DllPostgreSqlQuery(wrapper, L"SELECT 1");
 
-	// CASE: UNSUCCESSFUL CONNECTION
-	std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
-	DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database");
+    // CASE: UNSUCCESSFUL CONNECTION
+    std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
+    DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database");
     DllPostgreSqlClose(wrapper);
 
     // CASE: WRITE LOG
     std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
     DllLoggerInfo(logger, L"This is info message from logger");
-	DllLoggerError(logger, L"This is error message from logger (also to messagebox)", true);
+    DllLoggerError(logger, L"This is error message from logger (also to messagebox)", true);
 
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
-	//DllPostgreSqlConnect(wrapper, L"host=192.168.0.104 user=test dbname=test");
-	//DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=192.168.0.104 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
     DllPostgreSqlConnect(wrapper, L"host=10.0.1.8 user=test dbname=test");
 
     std::wcout << "client version = " << DllPostgreSqlClientVersion(wrapper) << std::endl;
@@ -67,8 +67,8 @@ int wmain(int argc, wchar_t * argv[])
         << "PRIMARY KEY (id)"
         << ")";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
-	DllPostgreSqlClearResult(wrapper);
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: INSERT RANDOM DATA
@@ -89,7 +89,7 @@ int wmain(int argc, wchar_t * argv[])
         DllPostgreSqlQuery(wrapper, query.str().c_str());
         DllPostgreSqlAffectedRows(wrapper, affected_rows);
         std::wcout << "affected_rows = " << affected_rows << std::endl;
-		DllPostgreSqlClearResult(wrapper);
+        DllPostgreSqlClearResult(wrapper);
         query.str(L"");
     }
 
@@ -107,7 +107,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlFetchField(wrapper, returned_id, 0, 0);
     std::wcout << "last_inserted_id = " << returned_id << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: UPDATE DATA
@@ -116,7 +116,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
     std::wcout << "affected_rows = " << affected_rows << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: DELETE DATA
@@ -125,7 +125,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
     std::wcout << "affected_rows = " << affected_rows << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: UPDATE NON-EXISTENT DATA
@@ -134,7 +134,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
     std::wcout << "affected_rows = " << affected_rows << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: DELETE NON-EXISTENT DATA
@@ -143,7 +143,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
     std::wcout << "affected_rows = " << affected_rows << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: CREATE IMPOSSIBLE UNIQUE INDEX
@@ -152,7 +152,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
     std::wcout << "affected_rows = " << affected_rows << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: CREATE POSSIBLE UNIQUE INDEX
@@ -162,7 +162,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlAffectedRows(wrapper, affected_rows);
     std::wcout << "affected_rows = " << affected_rows << std::endl;
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: INSERT COLLISION
@@ -170,29 +170,29 @@ int wmain(int argc, wchar_t * argv[])
     query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
     query << "VALUES ('SVKCZK', 1993, 1.0, 1.0, 1.0, 1.0)";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
-	// CASE: SILENCE INSERT COLLISION
-	std::wcout << std::endl << "CASE: SILENCE INSERT COLLISION" << std::endl;
-	query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
-	query << "VALUES ('SVKCZK', 1993, 1.0, 1.0, 1.0, 1.0)";
-	DllPostgreSqlQuery(wrapper, query.str().c_str(), true); // collison on unique index
-	DllPostgreSqlClearResult(wrapper);
-	query.str(L"");
+    // CASE: SILENCE INSERT COLLISION
+    std::wcout << std::endl << "CASE: SILENCE INSERT COLLISION" << std::endl;
+    query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
+    query << "VALUES ('SVKCZK', 1993, 1.0, 1.0, 1.0, 1.0)";
+    DllPostgreSqlQuery(wrapper, query.str().c_str(), true); // collison on unique index
+    DllPostgreSqlClearResult(wrapper);
+    query.str(L"");
 
     // CASE: UPDATE COLLISION
     std::wcout << std::endl << "CASE: UPDATE COLLISION" << std::endl;
     query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
     query << "VALUES ('SVKCZK', 1993, 2.0, 2.0, 2.0, 2.0)";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
     query << "UPDATE \"" << _test_data_table << "\" SET \"open\" = 1.0 WHERE \"open\" = 2.0";
     DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
     // CASE: SELECT * FROM
@@ -216,14 +216,14 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: FETCH FIELDS" << std::endl;
     wchar_t ** row = new wchar_t * [num_fields];
     for (int i = 0; i < num_fields; i++) { row[i] = new wchar_t[BUFFER_SIZE]; }
-	for (int i = 0; i < num_rows; i++) {
-		std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
-		for (int j = 0; j < num_fields; j++) {
-			DllPostgreSqlFetchField(wrapper, row[j], i, j);
-			std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
-		}
-		std::wcout << std::endl;
-	}
+    for (int i = 0; i < num_rows; i++) {
+        std::wcout << "fetching row " << (i + 1) << " of " << num_rows << std::endl;
+        for (int j = 0; j < num_fields; j++) {
+            DllPostgreSqlFetchField(wrapper, row[j], i, j);
+            std::wcout << "field[" << i << "][" << j << "] = " << row[j] << std::endl;
+        }
+        std::wcout << std::endl;
+    }
 
     // CASE: FETCH NON-EXISTENT ROW/FIELD
     std::wcout << std::endl << "CASE: FETCH NON-EXISTENT ROW/FIELD" << std::endl;
@@ -260,7 +260,7 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: QUERY ON CLOSED CONNECTION (SHOULD TRY RECONNECT)" << std::endl;
     query << "SELECT * FROM \"" << _test_data_table << "\" LIMIT 5";
     DllPostgreSqlQuery(wrapper,	query.str().c_str());
-	DllPostgreSqlClearResult(wrapper);
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
     
     // CASE: CLOSE ALREADY CLOSED CONNECTION
@@ -275,10 +275,10 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper,	query.str().c_str());
     query.str(L"");
 
-	DllLoggerDestroy(logger);
-	// CASE: WRITE LOG ON DESTROYED LOGGER
-	std::wcout << std::endl << "CASE: WRITE LOG ON DESTROYED LOGGER" << std::endl;
-	DllLoggerInfo(logger, L"This is info message from logger");
+    DllLoggerDestroy(logger);
+    // CASE: WRITE LOG ON DESTROYED LOGGER
+    std::wcout << std::endl << "CASE: WRITE LOG ON DESTROYED LOGGER" << std::endl;
+    DllLoggerInfo(logger, L"This is info message from logger");
 
     std::wcout << std::endl << "SUCCESS, HIT SOME KEY AND ENTER" << std::endl;
     wchar_t c;

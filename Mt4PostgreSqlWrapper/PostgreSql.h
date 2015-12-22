@@ -45,7 +45,7 @@ public:
     const std::wstring FieldList();
     const int NumFields();
     const int NumRows();
-	const bool Query(const std::wstring query, const bool silence_conflict = false);
+    const bool Query(const std::wstring query, const bool silence_conflict = false);
     const int ServerVersion();
 };
 

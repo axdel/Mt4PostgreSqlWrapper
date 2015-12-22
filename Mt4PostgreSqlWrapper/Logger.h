@@ -14,28 +14,28 @@ class Logger
 {
 private:
     const std::string log_file = "";
-	const std::string log_prefix = "";
+    const std::string log_prefix = "";
 
-	HANDLE log_file_handle = NULL;
+    HANDLE log_file_handle = NULL;
     
-	bool log_debug = false;
-	bool log_to_stdout = false;
+    bool log_debug = false;
+    bool log_to_stdout = false;
 
-	void WriteLog(std::wstringstream & log_message, const std::wstring log_level, const bool message_box = false);
+    void WriteLog(std::wstringstream & log_message, const std::wstring log_level, const bool message_box = false);
 
 public:
-	Logger(const std::string log_file, const std::string log_prefix = "");
+    Logger(const std::string log_file, const std::string log_prefix = "");
     ~Logger();
     
     const int GetLogger();
-	void LogDebug(const bool log_debug);
-	void LogToStdout(const bool log_to_stdout);
+    void LogDebug(const bool log_debug);
+    void LogToStdout(const bool log_to_stdout);
 
-	void Debug(std::wstringstream & log_message, const bool message_box = false);
-	void Info(std::wstringstream & log_message, const bool message_box = false);
-	void Warning(std::wstringstream & log_message, const bool message_box = false);
-	void Error(std::wstringstream & log_message, const bool message_box = false);
-	void Critical(std::wstringstream & log_message, const bool message_box = false);
+    void Debug(std::wstringstream & log_message, const bool message_box = false);
+    void Info(std::wstringstream & log_message, const bool message_box = false);
+    void Warning(std::wstringstream & log_message, const bool message_box = false);
+    void Error(std::wstringstream & log_message, const bool message_box = false);
+    void Critical(std::wstringstream & log_message, const bool message_box = false);
 };
 
 namespace {
