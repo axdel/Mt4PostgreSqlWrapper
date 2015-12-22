@@ -259,9 +259,9 @@ DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * field, co
 }
 
 //
-// FieldList
+// GetFieldList
 //
-const std::wstring PostgreSql::FieldList()
+const std::wstring PostgreSql::GetFieldList()
 {
     std::wstringstream log_message;
     std::wstringstream field_list;
@@ -282,14 +282,34 @@ const std::wstring PostgreSql::FieldList()
     return field_list.str();
 }
 
-DLLAPI void DllPostgreSqlFieldList(const int wrapper, wchar_t * const field_list)
+DLLAPI void DllPostgreSqlGetFieldList(const int wrapper, wchar_t * const field_list)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
-        std::wstring _field_list = _wrapper->FieldList();
+        std::wstring _field_list = _wrapper->GetFieldList();
         wcscpy_s(field_list, (_field_list.length() + 1), _field_list.c_str());
     } catch (...) {
-        FatalErrorMessageBox(L"DllPostgreSqlFieldList - called on already destroyed wrapper.");
+        FatalErrorMessageBox(L"DllPostgreSqlGetFieldList - called on already destroyed wrapper.");
+    }
+}
+
+//
+// GetLastError
+//
+const std::wstring PostgreSql::GetLastError()
+{
+    return this->last_error;
+}
+
+DLLAPI void DllPostgreSqlGetLastError(const int wrapper, wchar_t * const last_error)
+{
+    try {
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        std::wstring _last_error = _wrapper->GetLastError();
+        wcscpy_s(last_error, (_last_error.length() + 1), _last_error.c_str());
+    }
+    catch (...) {
+        FatalErrorMessageBox(L"DllPostgreSqlGetLastError - called on already destroyed wrapper.");
     }
 }
 
@@ -351,7 +371,9 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
 
     // TODO: use transactions
 
-    std::string _query(query.begin(), query.end());
+    std::string _query;
+    this->last_error = L"";
+    UnicodeToAnsi(query, &_query);
     this->result = PQexec(this->connection, _query.c_str());
 
     if (query.empty()) {
@@ -390,12 +412,13 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
         case PGRES_NONFATAL_ERROR:
         case PGRES_FATAL_ERROR: {
             std::string result_error = PQresultErrorMessage(this->result);
+            AnsiToUnicode(result_error, &this->last_error);
             if (silence_conflict && std::regex_search(result_error, duplicate_key)) {
                 log_message << "Conflict silenced (duplicate key value)";
                 this->logger->Debug(log_message);
             }
             else {
-                log_message << result_error.c_str();
+                log_message << this->last_error;
                 this->logger->Critical(log_message);
             }
             this->ClearResult();
@@ -439,7 +462,7 @@ DLLAPI const int DllPostgreSqlServerVersion(const int wrapper)
 //
 // WrapperVersion
 //
-DLLAPI const wchar_t * DllPostgreSqlWrapperVersion()
+DLLAPI const wchar_t * const DllPostgreSqlWrapperVersion()
 {
     return WRAPPER_VERSION;
 }

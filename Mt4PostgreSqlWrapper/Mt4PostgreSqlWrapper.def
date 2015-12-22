@@ -8,7 +8,8 @@ DllPostgreSqlClientVersion
 DllPostgreSqlClose
 DllPostgreSqlConnect
 DllPostgreSqlFetchField
-DllPostgreSqlFieldList
+DllPostgreSqlGetFieldList
+DllPostgreSqlGetLastError
 DllPostgreSqlNumFields
 DllPostgreSqlNumRows
 DllPostgreSqlQuery
