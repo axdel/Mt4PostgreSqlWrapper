@@ -171,18 +171,16 @@ const bool PostgreSql::CheckConnection()
 {
     std::wstringstream log_message;
 
+    if (PQstatus(this->connection) == CONNECTION_OK) { return true; }
+
     if (this->connection_string.empty()) {
         log_message << "Cannot connect, connection string is empty (Connect(...) not called?)";
         this->logger->Error(log_message);
         return false;
     }
-    if (PQstatus(this->connection) == CONNECTION_OK) {
-        return true;
-    }
 
     log_message << "Connection closed, trying to reconnect...";
     this->logger->Error(log_message);
-
     this->Close();
     return this->Connect(this->connection_string);
 }
@@ -393,7 +391,7 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
         case PGRES_FATAL_ERROR: {
             std::string result_error = PQresultErrorMessage(this->result);
             if (silence_conflict && std::regex_search(result_error, duplicate_key)) {
-                log_message << "Conflict silenced (duplicate key)";
+                log_message << "Conflict silenced (duplicate key value)";
                 this->logger->Debug(log_message);
             }
             else {
