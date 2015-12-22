@@ -97,7 +97,7 @@ public:
 #property link      "https://github.com/axdel/Mt4PostgreSqlWrapper"
 #property strict
 
-#import "C:\\Users\\Administrator\\Dropbox\\Trading\\Dlls\\Mt4PostgreSqlWrapper\\Release\\Mt4PostgreSqlWrapper.dll"
+#import "Mt4PostgreSqlWrapper.dll"
     void DllPostgreSqlDestroy(const int wrapper);
     const int DllPostgreSqlInit(const int logger);
     void DllPostgreSqlAffectedRows(const int wrapper, string & affected_rows);
