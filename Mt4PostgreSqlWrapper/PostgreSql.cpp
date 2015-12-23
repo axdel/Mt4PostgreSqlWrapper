@@ -357,7 +357,7 @@ DLLAPI const int DllPostgreSqlNumRows(const int wrapper)
 const bool PostgreSql::Query(const std::wstring query, const bool silence_conflict)
 {
     std::wstringstream log_message;
-    std::regex duplicate_key("duplicate key value");  // temporary until PostrgeSQL 9.5 ON CONFLICT DO NOTHING
+    std::regex duplicate_key_value("duplicate key value");
 
     if (!this->CheckConnection()) {
         return false;
@@ -368,8 +368,6 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
         log_message << "Uncleared result before new query";
         this->logger->Warning(log_message);
     }
-
-    // TODO: use transactions
 
     std::string _query;
     this->last_error = L"";
@@ -413,7 +411,7 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
         case PGRES_FATAL_ERROR: {
             std::string result_error = PQresultErrorMessage(this->result);
             AnsiToUnicode(result_error, &this->last_error);
-            if (silence_conflict && std::regex_search(result_error, duplicate_key)) {
+            if (silence_conflict && std::regex_search(result_error, duplicate_key_value)) {
                 log_message << "Conflict silenced (duplicate key value)";
                 this->logger->Debug(log_message);
             }
