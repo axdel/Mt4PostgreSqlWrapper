@@ -183,6 +183,12 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
+    // CASE: GET LAST ERROR (FROM SILENCED COLLISION)
+    std::wcout << std::endl << "CASE: GET LAST ERROR (FROM SILENCED COLLISION)" << std::endl;
+    wchar_t * last_error = new wchar_t[BUFFER_SIZE];
+    DllPostgreSqlGetLastError(wrapper, last_error);
+    std::wcout << "last_error = " << last_error << std::endl;
+
     // CASE: UPDATE COLLISION
     std::wcout << std::endl << "CASE: UPDATE COLLISION" << std::endl;
     query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
@@ -190,6 +196,8 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlClearResult(wrapper);
     query.str(L"");
+    DllPostgreSqlGetLastError(wrapper, last_error); // last error on successful query
+    std::wcout << "last_error = " << last_error << std::endl;
     query << "UPDATE \"" << _test_data_table << "\" SET \"open\" = 1.0 WHERE \"open\" = 2.0";
     DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
     DllPostgreSqlClearResult(wrapper);
@@ -209,7 +217,7 @@ int wmain(int argc, wchar_t * argv[])
     // CASE: GET FIELD LIST
     std::wcout << std::endl << "CASE: GET FIELD LIST" << std::endl;
     wchar_t * const field_list = new wchar_t[BUFFER_SIZE];
-    DllPostgreSqlFieldList(wrapper, field_list);
+    DllPostgreSqlGetFieldList(wrapper, field_list);
     std::wcout << "field_list = " << field_list << std::endl;
 
     // CASE: FETCH FIELDS
@@ -238,7 +246,7 @@ int wmain(int argc, wchar_t * argv[])
 
     // CASE: FIELD LIST ON CLEARED RESULT
     std::wcout << std::endl << "CASE: FIELD LIST ON CLEARED RESULT" << std::endl;
-    DllPostgreSqlFieldList(wrapper, field_list);
+    DllPostgreSqlGetFieldList(wrapper, field_list);
     std::wcout << "field_list = " << field_list << std::endl;
 
     // CASE: FETCH ROW(S) ON CLEARED RESULT
