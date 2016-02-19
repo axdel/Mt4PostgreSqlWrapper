@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Administrator\Dropbox\Trading\Dlls\Mt4PostgreSqlWrapper\Mt4PostgreSqlWrapper;C:\Program Files %28x86%29\PostgreSQL\9.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Administrator\Dlls\Mt4PostgreSqlWrapper\Mt4PostgreSqlWrapper;C:\Program Files %28x86%29\PostgreSQL\9.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
@@ -81,14 +81,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Common.h" />
-    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Logger.h" />
-    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\PostgreSql.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\Mt4PostgreSqlWrapper\Logger.cpp" />
     <ClCompile Include="..\..\Mt4PostgreSqlWrapper\PostgreSql.cpp" />
     <ClCompile Include="Test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Common.h" />
+    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\Logger.h" />
+    <ClInclude Include="..\..\Mt4PostgreSqlWrapper\PostgreSql.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

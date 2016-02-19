@@ -136,7 +136,7 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
         if (PQstatus(this->connection) == CONNECTION_OK) {
             log_message << "opened [c:" << this->connection << ", w:" << this << "]";
             this->logger->Info(log_message);
-            log_message << "PostgreSQL version client:" << this->ClientVersion() << ", server:" << this->ServerVersion() << ", wrapper:" << WRAPPER_VERSION;
+            log_message << "PostgreSQL server " << this->ServerVersion() << " - connected with client " << this->ClientVersion() << " (wrapper-" << WRAPPER_VERSION << ")";
             this->logger->Info(log_message);
             return true;
         } else {
