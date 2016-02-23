@@ -15,7 +15,7 @@ PostgreSql::PostgreSql(Logger * const logger)
     log_message << "PostgreSQL wrapper created (wrapper:0x" << this << ")";
 
     this->logger = logger;
-    this->logger->Info(log_message);
+    this->logger->Info(LOG(log_message));
 }
 
 const int DllPostgreSqlInit(const int logger)
@@ -32,7 +32,7 @@ PostgreSql::~PostgreSql()
 {
     std::wstringstream log_message;
     log_message << "PostgreSQL wrapper destroyed (wrapper:0x" << this << ")";
-    this->logger->Info(log_message);
+    this->logger->Info(LOG(log_message));
 }
 
 DLLAPI void DllPostgreSqlDestroy(const int wrapper)
@@ -83,7 +83,7 @@ void PostgreSql::ClearResult()
     } else {
         log_message << "was already cleared";
     }
-    this->logger->Debug(log_message);
+    this->logger->Debug(LOG(log_message));
 }
 
 DLLAPI void DllPostgreSqlClearResult(const int wrapper)
@@ -133,13 +133,13 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
         this->connection = PQconnectdb(this->_connection_string.c_str());
         if (PQstatus(this->connection) == CONNECTION_OK) {
             log_message << "opened (connection:0x" << this->connection << ", wrapper:0x" << this << ")";
-            this->logger->Info(log_message);
+            this->logger->Info(LOG(log_message));
             log_message << "PostgreSQL server " << this->ServerVersion() << " - connected with client " << this->ClientVersion() << " (wrapper-" << WRAPPER_VERSION << ")";
-            this->logger->Info(log_message);
+            this->logger->Info(LOG(log_message));
             return true;
         } else {
             log_message << "failed (connection:0x" << this->connection << ", wrapper:0x" << this << ")" << std::endl << PQerrorMessage(this->connection);
-            this->logger->Error(log_message);
+            this->logger->Error(LOG(log_message));
             Sleep(SLEEP_CONNECT_FAILED);
         }
         attempt++;
@@ -170,12 +170,12 @@ const bool PostgreSql::CheckConnection()
 
     if (this->connection_string.empty()) {
         log_message << "Cannot connect, connection string is empty (Connect(...) not called?)";
-        this->logger->Error(log_message);
+        this->logger->Error(LOG(log_message));
         return false;
     }
 
     log_message << "Connection closed, trying to reconnect...";
-    this->logger->Error(log_message);
+    this->logger->Error(LOG(log_message));
     this->Close();
     return this->Connect(this->connection_string);
 }
@@ -207,7 +207,7 @@ void PostgreSql::Close()
     } else {
         log_message << "was already closed";
     }
-    this->logger->Info(log_message);
+    this->logger->Info(LOG(log_message));
 }
 
 DLLAPI void DllPostgreSqlClose(const int wrapper)
@@ -233,13 +233,13 @@ const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, cons
     if (this->result == NULL) {
         log_message << "Cannot fetch row: " << row_num << ", field: " << field_num;
         log_message << ", no active result found (probably cleared?)";
-        this->logger->Error(log_message);
+        this->logger->Error(LOG(log_message));
         return false;
     }
     if ((row_num + 1) > this->num_rows || (field_num + 1) > this->num_fields) {
         log_message << "Cannot fetch row: " << row_num << ", field: " << field_num;
         log_message << ", rows:" << this->num_rows << ", fields:" << this->num_fields;
-        this->logger->Error(log_message);
+        this->logger->Error(LOG(log_message));
         wcscpy_s(field, 4, L"N_A");
         return false;
     }
@@ -275,7 +275,7 @@ const std::wstring PostgreSql::GetFieldList()
 
     if (this->result == NULL) {
         log_message << "Cannot get field list - no active result found (probably cleared?)";
-        this->logger->Error(log_message);
+        this->logger->Error(LOG(log_message));
         return L"";
     }
 
@@ -284,7 +284,7 @@ const std::wstring PostgreSql::GetFieldList()
     }
 
     log_message << "Field list: " << field_list.str();
-    this->logger->Debug(log_message);
+    this->logger->Debug(LOG(log_message));
 
     return field_list.str();
 }
@@ -367,14 +367,14 @@ const bool PostgreSql::Query(const std::wstring query)
 
     if (!this->CheckConnection()) {
         log_message << "Cannot query database - no database connection";
-        this->logger->Error(log_message);
+        this->logger->Error(LOG(log_message));
         return false;
     }
 
     if (this->result != NULL) {
         this->ClearResult();
         log_message << "Uncleared result before new query";
-        this->logger->Warning(log_message);
+        this->logger->Warning(LOG(log_message));
     }
 
     std::string _query;
@@ -388,7 +388,7 @@ const bool PostgreSql::Query(const std::wstring query)
     else {
         log_message << "SQL: " << query;
     }
-    this->logger->Debug(log_message);
+    this->logger->Debug(LOG(log_message));
     switch (PQresultStatus(this->result))
     {
         case PGRES_EMPTY_QUERY: {
@@ -402,7 +402,7 @@ const bool PostgreSql::Query(const std::wstring query)
             } else {
                 log_message << "Nothing returned";
             }
-            this->logger->Debug(log_message);
+            this->logger->Debug(LOG(log_message));
             // clear result manualy
             break;
         }
@@ -410,7 +410,7 @@ const bool PostgreSql::Query(const std::wstring query)
             this->num_rows = PQntuples(this->result);
             this->num_fields = PQnfields(this->result);
             log_message << "Returned " << this->num_rows << " rows, " << this->num_fields << " fields";
-            this->logger->Debug(log_message);
+            this->logger->Debug(LOG(log_message));
             // clear result manualy
             break;
         }
@@ -418,7 +418,7 @@ const bool PostgreSql::Query(const std::wstring query)
         case PGRES_NONFATAL_ERROR:
         case PGRES_FATAL_ERROR: {
             log_message << PQresultErrorMessage(this->result);
-            this->logger->Critical(log_message);
+            this->logger->Critical(LOG(log_message));
             this->ClearResult();
             return false;
         }

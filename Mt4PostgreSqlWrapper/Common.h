@@ -38,6 +38,7 @@ inline std::wstring __FILENAME__(std::wstring file_path) {
     if (std::regex_search(file_path, match, regex)) { filename = match[1].str(); }
     return filename;
 }
-#define LOG_POS " [" << __FILENAME__(_STR2WSTR(__FILE__)) << "|" << __FUNCTIONW__ << "|" << __LINE__ << "]"
+//#define LOG(log_message) log_message
+#define LOG(log_message) dynamic_cast<std::wstringstream &>(log_message << " [" << __FILENAME__(_STR2WSTR(__FILE__)) << "|" << __FUNCTIONW__ << "|" << __LINE__ << "]")
 
 #endif
