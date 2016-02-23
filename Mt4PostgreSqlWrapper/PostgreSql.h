@@ -45,7 +45,7 @@ public:
     const std::wstring GetLastError();
     const int NumFields();
     const int NumRows();
-    const bool Query(const std::wstring query, const bool silence_conflict = false);
+    const bool Query(const std::wstring query);
     const int ServerVersion();
 };
 
@@ -71,7 +71,7 @@ DLLAPI void DllPostgreSqlGetFieldList(const int wrapper, wchar_t * const field_l
 DLLAPI void DllPostgreSqlGetLastError(const int wrapper, wchar_t * const last_error);
 DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
-DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query, const bool silence_conflict = false);
+DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query);
 DLLAPI const int DllPostgreSqlServerVersion(const int wrapper);
 DLLAPI const wchar_t * const DllPostgreSqlWrapperVersion();
 

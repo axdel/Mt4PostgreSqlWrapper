@@ -361,12 +361,13 @@ DLLAPI const int DllPostgreSqlNumRows(const int wrapper)
 //
 // Query
 //
-const bool PostgreSql::Query(const std::wstring query, const bool silence_conflict)
+const bool PostgreSql::Query(const std::wstring query)
 {
     std::wstringstream log_message;
 
     if (!this->CheckConnection()) {
         log_message << "Cannot query database - no database connection";
+        this->logger->Error(log_message);
         return false;
     }
 
@@ -416,9 +417,7 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
         case PGRES_BAD_RESPONSE:
         case PGRES_NONFATAL_ERROR:
         case PGRES_FATAL_ERROR: {
-            std::string result_error = PQresultErrorMessage(this->result);
-            AnsiToUnicode(result_error, &this->last_error);
-            log_message << this->last_error;
+            log_message << PQresultErrorMessage(this->result);
             this->logger->Critical(log_message);
             this->ClearResult();
             return false;
@@ -428,11 +427,11 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
     return true;
 }
 
-DLLAPI const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query, const bool silence_conflict)
+DLLAPI const bool DllPostgreSqlQuery(const int wrapper, wchar_t const * const query)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
-        return _wrapper->Query(query, silence_conflict);
+        return _wrapper->Query(query);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlQuery - called on already destroyed wrapper.");
         return false;

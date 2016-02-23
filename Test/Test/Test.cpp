@@ -38,7 +38,6 @@ int wmain(int argc, wchar_t * argv[])
     // CASE: WRITE LOG
     std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
     DllLoggerInfo(logger, L"This is info message from logger");
-    DllLoggerError(logger, L"This is error message from logger (also to messagebox)", true);
 
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
@@ -183,14 +182,6 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlClearResult(wrapper);
     DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
-    DllPostgreSqlClearResult(wrapper);
-    query.str(L"");
-
-    // CASE: SILENCE INSERT COLLISION
-    std::wcout << std::endl << "CASE: SILENCE INSERT COLLISION" << std::endl;
-    query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
-    query << "VALUES ('SVKCZK', 1993, 1.0, 1.0, 1.0, 1.0)";
-    DllPostgreSqlQuery(wrapper, query.str().c_str(), true); // collison on unique index
     DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
