@@ -4,6 +4,7 @@
 //
 #include <vector>
 
+#include "Common.h"
 #include "Logger.h"
 #include "PostgreSql.h"
 
@@ -24,6 +25,11 @@ int wmain(int argc, wchar_t * argv[])
     std::wcout << std::endl << "CASE: QUERY ON UNKNOWN DATABASE" << std::endl;
     DllPostgreSqlQuery(wrapper, L"SELECT 1");
 
+    // CASE: FAILED CONNECTION CHECK
+    std::wcout << std::endl << "CASE: FAILED CONNECTION CHECK" << std::endl;
+    bool conneciton_check = DllPostgreSqlCheckConnection(wrapper);
+    std::wcout << conneciton_check << std::endl;
+
     // CASE: UNSUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
     DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database");
@@ -36,12 +42,17 @@ int wmain(int argc, wchar_t * argv[])
 
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
-    //DllPostgreSqlConnect(wrapper, L"host=192.168.0.104 user=test dbname=test");
-    DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
-    //DllPostgreSqlConnect(wrapper, L"host=10.0.1.8 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=192.168.0.107 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
+    DllPostgreSqlConnect(wrapper, L"host=10.0.1.14 user=test dbname=test");
 
     std::wcout << "client version = " << DllPostgreSqlClientVersion(wrapper) << std::endl;
     std::wcout << "server version = " << DllPostgreSqlServerVersion(wrapper) << std::endl;
+
+    // CASE: SUCCESSFUL CONNECTION CHECK
+    std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION CHECK" << std::endl;
+    conneciton_check = DllPostgreSqlCheckConnection(wrapper);
+    std::wcout << conneciton_check << std::endl;
 
     // CASE: EMPTY QUERY
     std::wcout << std::endl << "CASE: EMPTY QUERY" << std::endl;

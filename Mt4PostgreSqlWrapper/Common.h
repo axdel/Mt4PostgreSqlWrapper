@@ -1,10 +1,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <crtdefs.h>
 #include <iostream>
+#include <regex>
 #include <Windows.h>
 
-const wchar_t WRAPPER_VERSION[] = L"2016.02.19";
+#define DLLAPI extern "C" __declspec(dllexport)
+
+#define WRAPPER_VERSION L"2016.02.23"
 
 namespace {
     inline void AnsiToUnicode(const std::string & in, std::wstring * const out) {
@@ -24,6 +28,16 @@ namespace {
     }
 }
 
-#define DLLAPI extern "C" __declspec(dllexport)
+//
+// log postion
+//
+inline std::wstring __FILENAME__(std::wstring file_path) {
+    std::wstring filename = L"unknown";
+    std::wsmatch match;
+    std::wregex regex(L"^.*?\\\\(\\w+\\.\\w+)$");
+    if (std::regex_search(file_path, match, regex)) { filename = match[1].str(); }
+    return filename;
+}
+#define LOG_POS " [" << __FILENAME__(_STR2WSTR(__FILE__)) << "|" << __FUNCTIONW__ << "|" << __LINE__ << "]"
 
 #endif

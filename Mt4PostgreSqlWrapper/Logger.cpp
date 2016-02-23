@@ -104,20 +104,20 @@ DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout)
 //
 // Debug
 //
-void Logger::Debug(std::wstringstream & log_message, const bool message_box)
+void Logger::Debug(std::wstringstream & log_message)
 {
     if (this->log_debug) {
-        this->WriteLog(log_message, L"DEBUG", message_box);
+        this->WriteLog(log_message, L"DEBUG");
     }
 }
 
-DLLAPI void DllLoggerDebug(const int logger, const wchar_t * const log_message, const bool message_box)
+DLLAPI void DllLoggerDebug(const int logger, const wchar_t * const log_message)
 {
     try {
         Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _logger->Debug(_log_message, message_box);
+        return _logger->Debug(_log_message);
     }
     catch (...) {
         FatalErrorMessageBox(L"DllLoggerDebug - called on already destroyed logger.");
@@ -127,18 +127,18 @@ DLLAPI void DllLoggerDebug(const int logger, const wchar_t * const log_message, 
 //
 // Info
 //
-void Logger::Info(std::wstringstream & log_message, const bool message_box)
+void Logger::Info(std::wstringstream & log_message)
 {
-    this->WriteLog(log_message, L"INFO", message_box);
+    this->WriteLog(log_message, L"INFO");
 }
 
-DLLAPI void DllLoggerInfo(const int logger, const wchar_t * const log_message, const bool message_box)
+DLLAPI void DllLoggerInfo(const int logger, const wchar_t * const log_message)
 {
     try {
         Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _logger->Info(_log_message, message_box);
+        return _logger->Info(_log_message);
     }
     catch (...) {
         FatalErrorMessageBox(L"DllLoggerInfo - called on already destroyed logger.");
@@ -148,18 +148,18 @@ DLLAPI void DllLoggerInfo(const int logger, const wchar_t * const log_message, c
 //
 // Warning
 //
-void Logger::Warning(std::wstringstream & log_message, const bool message_box)
+void Logger::Warning(std::wstringstream & log_message)
 {
-    this->WriteLog(log_message, L"WARNING", message_box);
+    this->WriteLog(log_message, L"WARNING");
 }
 
-DLLAPI void DllLoggerWarning(const int logger, const wchar_t * const log_message, const bool message_box)
+DLLAPI void DllLoggerWarning(const int logger, const wchar_t * const log_message)
 {
     try {
         Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _logger->Warning(_log_message, message_box);
+        return _logger->Warning(_log_message);
     }
     catch (...) {
         FatalErrorMessageBox(L"DllLoggerWarning - called on already destroyed logger.");
@@ -169,18 +169,18 @@ DLLAPI void DllLoggerWarning(const int logger, const wchar_t * const log_message
 //
 // Error
 //
-void Logger::Error(std::wstringstream & log_message, const bool message_box)
+void Logger::Error(std::wstringstream & log_message)
 {
-    this->WriteLog(log_message, L"ERROR", message_box);
+    this->WriteLog(log_message, L"ERROR");
 }
 
-DLLAPI void DllLoggerError(const int logger, const wchar_t * const log_message, const bool message_box)
+DLLAPI void DllLoggerError(const int logger, const wchar_t * const log_message)
 {
     try {
         Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _logger->Error(_log_message, message_box);
+        return _logger->Error(_log_message);
     }
     catch (...) {
         FatalErrorMessageBox(L"DllLoggerError - called on already destroyed logger.");
@@ -190,18 +190,18 @@ DLLAPI void DllLoggerError(const int logger, const wchar_t * const log_message, 
 //
 // Critical
 //
-void Logger::Critical(std::wstringstream & log_message, const bool message_box)
+void Logger::Critical(std::wstringstream & log_message)
 {
-    this->WriteLog(log_message, L"CRITICAL", message_box);
+    this->WriteLog(log_message, L"CRITICAL");
 }
 
-DLLAPI void DllLoggerCritical(const int logger, const wchar_t * const log_message, const bool message_box)
+DLLAPI void DllLoggerCritical(const int logger, const wchar_t * const log_message)
 {
     try {
         Logger * const _logger = GetLogger(logger);
         std::wstringstream _log_message;
         _log_message << log_message;
-        return _logger->Critical(_log_message, message_box);
+        return _logger->Critical(_log_message);
     }
     catch (...) {
         FatalErrorMessageBox(L"DllLoggerCritical - called on already destroyed logger.");
@@ -211,7 +211,7 @@ DLLAPI void DllLoggerCritical(const int logger, const wchar_t * const log_messag
 //
 // WriteLog
 //
-void Logger::WriteLog(std::wstringstream & log_message, const std::wstring log_level, const bool message_box)
+void Logger::WriteLog(std::wstringstream & log_message, const std::wstring log_level)
 {
     std::string _log_message, _log_level;
     UnicodeToAnsi(log_message.str(), &_log_message);
@@ -240,11 +240,6 @@ void Logger::WriteLog(std::wstringstream & log_message, const std::wstring log_l
     
     if (this->log_file_handle != NULL) {
         WriteFile(this->log_file_handle, formatted_message.str().c_str(), strlen(formatted_message.str().c_str()), &bytes_writen, NULL);
-    }
-    if (message_box) {
-        std::wstring _formatted_message;
-        AnsiToUnicode(formatted_message.str(), &_formatted_message);
-        WindowsMessageBox(_formatted_message, L"Logger", MB_ICONWARNING | MB_OK);
     }
     
     log_message.str(L""); // clear message

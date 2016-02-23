@@ -3,6 +3,7 @@ EXPORTS
 DllPostgreSqlDestroy
 DllPostgreSqlInit
 DllPostgreSqlAffectedRows
+DllPostgreSqlCheckConnection
 DllPostgreSqlClearResult
 DllPostgreSqlClientVersion
 DllPostgreSqlClose

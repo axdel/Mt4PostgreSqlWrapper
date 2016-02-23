@@ -12,7 +12,7 @@
 PostgreSql::PostgreSql(Logger * const logger)
 {
     std::wstringstream log_message;
-    log_message << "PostgreSQL wrapper created [w:" << this << "]";
+    log_message << "PostgreSQL wrapper created (wrapper:0x" << this << ")";
 
     this->logger = logger;
     this->logger->Info(log_message);
@@ -31,7 +31,7 @@ const int DllPostgreSqlInit(const int logger)
 PostgreSql::~PostgreSql()
 {
     std::wstringstream log_message;
-    log_message << "PostgreSQL wrapper destroyed [w:" << this << "]";
+    log_message << "PostgreSQL wrapper destroyed (wrapper:0x" << this << ")";
     this->logger->Info(log_message);
 }
 
@@ -122,34 +122,29 @@ DLLAPI const int DllPostgreSqlClientVersion(const int wrapper)
 const bool PostgreSql::Connect(const std::wstring connection_string)
 {
     std::wstringstream log_message;
-    std::wstringstream error_message;
-    error_message << "Unable to connect to database (repeatedly), logged error(s):\n\n";
 
     this->connection_string = connection_string;
     UnicodeToAnsi(connection_string, &this->_connection_string);
 
-    int reconnect_attepts = MAX_RECONNECT_ATTEMPTS;
+    int attempt = 1;
+    int max_attepts = MAX_CONNECT_ATTEMPTS;
     do {
-        int i = (MAX_RECONNECT_ATTEMPTS-reconnect_attepts) + 1;
-        log_message << "Opening database connection (attempt:" << i << ") ... ";
+        log_message << "Opening database connection (attempt:" << attempt << ") ... ";
         this->connection = PQconnectdb(this->_connection_string.c_str());
         if (PQstatus(this->connection) == CONNECTION_OK) {
-            log_message << "opened [c:" << this->connection << ", w:" << this << "]";
+            log_message << "opened (connection:0x" << this->connection << ", wrapper:0x" << this << ")";
             this->logger->Info(log_message);
             log_message << "PostgreSQL server " << this->ServerVersion() << " - connected with client " << this->ClientVersion() << " (wrapper-" << WRAPPER_VERSION << ")";
             this->logger->Info(log_message);
             return true;
         } else {
-            log_message << "failed [c:" << this->connection << ", w:" << this << "]" << std::endl << PQerrorMessage(this->connection);
+            log_message << "failed (connection:0x" << this->connection << ", wrapper:0x" << this << ")" << std::endl << PQerrorMessage(this->connection);
             this->logger->Error(log_message);
-            error_message << "Attempt #" << i << ": ";
-            error_message << PQerrorMessage(this->connection);
-            Sleep(SLEEP_RECONNECT_FAILED);
+            Sleep(SLEEP_CONNECT_FAILED);
         }
-    } while (PQstatus(this->connection) == CONNECTION_BAD && --reconnect_attepts);
+        attempt++;
+    } while (PQstatus(this->connection) == CONNECTION_BAD && --max_attepts);
 
-    error_message << std::endl << "connection: " << connection_string;
-    FatalErrorMessageBox(error_message.str());
     return false;
 }
 
@@ -185,6 +180,18 @@ const bool PostgreSql::CheckConnection()
     return this->Connect(this->connection_string);
 }
 
+DLLAPI const bool DllPostgreSqlCheckConnection(const int wrapper)
+{
+    try {
+        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
+        return _wrapper->CheckConnection();
+    }
+    catch (...) {
+        FatalErrorMessageBox(L"DllPostgreSqlCheckConnection - called on already destroyed wrapper.");
+        return false;
+    }
+}
+
 //
 // Close
 //
@@ -192,7 +199,7 @@ void PostgreSql::Close()
 {
     std::wstringstream log_message;
 
-    log_message << "Closing connection [c:" << this->connection << ", w:" << this << "] ... ";
+    log_message << "Closing connection (connection:0x" << this->connection << ", wrapper:0x" << this << ") ... ";
     if (this->connection != NULL) {
         PQfinish(this->connection);
         this->connection = NULL;
@@ -357,9 +364,9 @@ DLLAPI const int DllPostgreSqlNumRows(const int wrapper)
 const bool PostgreSql::Query(const std::wstring query, const bool silence_conflict)
 {
     std::wstringstream log_message;
-    std::regex duplicate_key_value("duplicate key value");
 
     if (!this->CheckConnection()) {
+        log_message << "Cannot query database - no database connection";
         return false;
     }
 
@@ -411,14 +418,8 @@ const bool PostgreSql::Query(const std::wstring query, const bool silence_confli
         case PGRES_FATAL_ERROR: {
             std::string result_error = PQresultErrorMessage(this->result);
             AnsiToUnicode(result_error, &this->last_error);
-            if (silence_conflict && std::regex_search(result_error, duplicate_key_value)) {
-                log_message << "Conflict silenced (duplicate key value)";
-                this->logger->Debug(log_message);
-            }
-            else {
-                log_message << this->last_error;
-                this->logger->Critical(log_message);
-            }
+            log_message << this->last_error;
+            this->logger->Critical(log_message);
             this->ClearResult();
             return false;
         }

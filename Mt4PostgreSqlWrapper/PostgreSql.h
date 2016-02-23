@@ -1,9 +1,7 @@
 #ifndef POSTGRESQL_H
 #define POSTGRESQL_H
 
-#include <ctime>
 #include <iostream>
-#include <regex>
 #include <sstream>
 
 #define WIN32_LEAN_AND_MEAN
@@ -13,8 +11,8 @@
 #include "Common.h"
 #include "Logger.h"
 
-const int MAX_RECONNECT_ATTEMPTS = 3;
-const int SLEEP_RECONNECT_FAILED = 1000;
+const int MAX_CONNECT_ATTEMPTS = 3;
+const int SLEEP_CONNECT_FAILED = 1000;
 
 class PostgreSql
 {
@@ -32,13 +30,12 @@ private:
 
     Logger * logger = NULL;
 
-    const bool CheckConnection();
-
 public:
     PostgreSql(Logger * const logger);
     ~PostgreSql();
 
     const std::wstring AffectedRows();
+    const bool CheckConnection();
     void ClearResult();
     const int ClientVersion();
     void Close();
@@ -64,6 +61,7 @@ namespace {
 DLLAPI void DllPostgreSqlDestroy(const int wrapper);
 DLLAPI const int DllPostgreSqlInit(const int logger);
 DLLAPI void DllPostgreSqlAffectedRows(const int wrapper, wchar_t * const affected_rows);
+DLLAPI const bool DllPostgreSqlCheckConnection(const int wrapper);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion(const int wrapper);
 DLLAPI void DllPostgreSqlClose(const int wrapper);
