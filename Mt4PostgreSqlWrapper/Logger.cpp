@@ -16,7 +16,7 @@ Logger::Logger(const std::string log_file, const std::string log_prefix) : log_f
     );
     if (this->log_file_handle == INVALID_HANDLE_VALUE) {
         this->log_file_handle = NULL;
-        error_message << "Cannot create file: " << this->log_file.c_str() << " (Error code: " << GetLastError() << ")";
+        error_message << "Cannot create file: " << this->log_file.c_str() << " (error code: " << GetLastError() << ")";
         FatalErrorMessageBox(error_message.str());
     }
 }

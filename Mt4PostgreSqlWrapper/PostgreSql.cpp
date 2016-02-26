@@ -12,7 +12,7 @@
 PostgreSql::PostgreSql(Logger * const logger)
 {
     std::wstringstream log_message;
-    log_message << "PostgreSQL wrapper created (wrapper:0x" << this << ")";
+    log_message << "PostgreSQL wrapper created (wrapper: 0x" << this << ")";
 
     this->logger = logger;
     this->logger->Info(LOG(log_message));
@@ -31,7 +31,7 @@ const int DllPostgreSqlInit(const int logger)
 PostgreSql::~PostgreSql()
 {
     std::wstringstream log_message;
-    log_message << "PostgreSQL wrapper destroyed (wrapper:0x" << this << ")";
+    log_message << "PostgreSQL wrapper destroyed (wrapper: 0x" << this << ")";
     this->logger->Info(LOG(log_message));
 }
 
@@ -129,16 +129,16 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
     int attempt = 1;
     int max_attepts = MAX_CONNECT_ATTEMPTS;
     do {
-        log_message << "Opening database connection (attempt:" << attempt << ") ... ";
+        log_message << "Opening database connection (attempt: " << attempt << ") ... ";
         this->connection = PQconnectdb(this->_connection_string.c_str());
         if (PQstatus(this->connection) == CONNECTION_OK) {
-            log_message << "opened (connection:0x" << this->connection << ", wrapper:0x" << this << ")";
+            log_message << "opened (connection: 0x" << this->connection << ", wrapper: 0x" << this << ")";
             this->logger->Info(LOG(log_message));
             log_message << "PostgreSQL server " << this->ServerVersion() << " - connected with client " << this->ClientVersion() << " (wrapper-" << WRAPPER_VERSION << ")";
             this->logger->Info(LOG(log_message));
             return true;
         } else {
-            log_message << "failed (connection:0x" << this->connection << ", wrapper:0x" << this << ")" << std::endl << PQerrorMessage(this->connection);
+            log_message << "failed (connection: 0x" << this->connection << ", wrapper: 0x" << this << ")" << std::endl << PQerrorMessage(this->connection);
             this->logger->Error(LOG(log_message));
             Sleep(SLEEP_CONNECT_FAILED);
         }
