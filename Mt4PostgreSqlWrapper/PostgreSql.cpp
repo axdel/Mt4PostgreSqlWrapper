@@ -119,15 +119,18 @@ DLLAPI const int DllPostgreSqlClientVersion(const int wrapper)
 //
 // Connect
 //
-const bool PostgreSql::Connect(const std::wstring connection_string)
+const bool PostgreSql::Connect(const std::wstring connection_string, const int max_attempts, const int sleep)
 {
     std::wstringstream log_message;
 
     this->connection_string = connection_string;
     UnicodeToAnsi(connection_string, &this->_connection_string);
 
+    this->max_connection_attempts = max_attempts;
+    this->failed_connection_sleep = sleep;
+
     int attempt = 1;
-    int max_attepts = MAX_CONNECT_ATTEMPTS;
+    int _max_attepts = this->max_connection_attempts;
     do {
         log_message << "Opening database connection (attempt: " << attempt << ") ... ";
         this->connection = PQconnectdb(this->_connection_string.c_str());
@@ -140,19 +143,19 @@ const bool PostgreSql::Connect(const std::wstring connection_string)
         } else {
             log_message << "failed (connection: 0x" << this->connection << ", wrapper: 0x" << this << ")" << std::endl << PQerrorMessage(this->connection);
             this->logger->Error(LOG(log_message));
-            Sleep(SLEEP_CONNECT_FAILED);
+            Sleep(sleep);
         }
         attempt++;
-    } while (PQstatus(this->connection) == CONNECTION_BAD && --max_attepts);
+    } while (PQstatus(this->connection) == CONNECTION_BAD && --_max_attepts);
 
     return false;
 }
 
-DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string)
+DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string, const int max_attempts, const int sleep)
 {
     try {
         PostgreSql * const _wrapper = GetPostgreSql(wrapper);
-        return _wrapper->Connect(connection_string);
+        return _wrapper->Connect(connection_string, max_attempts, sleep);
     } catch (...) {
         FatalErrorMessageBox(L"DllPostgreSqlConnect - called on already destroyed wrapper.");
         return false;
@@ -177,7 +180,7 @@ const bool PostgreSql::CheckConnection()
     log_message << "Connection closed, trying to reconnect...";
     this->logger->Error(LOG(log_message));
     this->Close();
-    return this->Connect(this->connection_string);
+    return this->Connect(this->connection_string, this->max_connection_attempts, this->failed_connection_sleep);
 }
 
 DLLAPI const bool DllPostgreSqlCheckConnection(const int wrapper)

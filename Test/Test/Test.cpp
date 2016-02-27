@@ -30,9 +30,14 @@ int wmain(int argc, wchar_t * argv[])
     bool conneciton_check = DllPostgreSqlCheckConnection(wrapper);
     std::wcout << conneciton_check << std::endl;
 
-    // CASE: UNSUCCESSFUL CONNECTION
-    std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION" << std::endl;
-    DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database");
+    // CASE: UNSUCCESSFUL CONNECTION NO RETRY
+    std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION NO RETRY" << std::endl;
+    DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database", 1, 3000);
+    DllPostgreSqlClose(wrapper);
+    
+    // CASE: UNSUCCESSFUL CONNECTION 3 RETRIES
+    std::wcout << std::endl << "CASE: UNSUCCESSFUL CONNECTION 3 RETRIES" << std::endl;
+    DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database", 3, 3000);
     DllPostgreSqlClose(wrapper);
 
     // CASE: WRITE LOG

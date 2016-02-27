@@ -11,15 +11,15 @@
 #include "Common.h"
 #include "Logger.h"
 
-const int MAX_CONNECT_ATTEMPTS = 3;
-const int SLEEP_CONNECT_FAILED = 1000;
-
 class PostgreSql
 {
 private:
     PGconn * connection = NULL;
     std::wstring connection_string = L"";
     std::string _connection_string = "";
+
+    int max_connection_attempts = 10;
+    int failed_connection_sleep = 600;
 
     PGresult * result = NULL;
     int num_rows = 0;
@@ -37,7 +37,7 @@ public:
     void ClearResult();
     const int ClientVersion();
     void Close();
-    const bool Connect(const std::wstring connection_string);
+    const bool Connect(const std::wstring connection_string, const int max_attempts, const int sleep);
     const bool FetchField(wchar_t * const field, const int row_num, const int field_num);
     const std::wstring GetFieldList();
     const int NumFields();
@@ -62,7 +62,7 @@ DLLAPI const bool DllPostgreSqlCheckConnection(const int wrapper);
 DLLAPI void DllPostgreSqlClearResult(const int wrapper);
 DLLAPI const int DllPostgreSqlClientVersion(const int wrapper);
 DLLAPI void DllPostgreSqlClose(const int wrapper);
-DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string);
+DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string, const int max_attempts = 10, const int sleep = 6000);
 DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * const field, const int row_num, const int field_num);
 DLLAPI void DllPostgreSqlGetFieldList(const int wrapper, wchar_t * const field_list);
 DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
