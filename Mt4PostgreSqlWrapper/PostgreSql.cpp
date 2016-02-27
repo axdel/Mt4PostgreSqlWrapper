@@ -238,7 +238,7 @@ const bool PostgreSql::FetchField(wchar_t * const field, const int row_num, cons
     }
     if ((row_num + 1) > this->num_rows || (field_num + 1) > this->num_fields) {
         log_message << "Cannot fetch row: " << row_num << ", field: " << field_num;
-        log_message << ", rows:" << this->num_rows << ", fields:" << this->num_fields;
+        log_message << " (rows: " << this->num_rows << ", fields: " << this->num_fields << ")";
         this->logger->Error(LOG(log_message));
         wcscpy_s(field, 4, L"N_A");
         return false;
@@ -301,26 +301,6 @@ DLLAPI void DllPostgreSqlGetFieldList(const int wrapper, wchar_t * const field_l
 }
 
 //
-// GetLastError
-//
-const std::wstring PostgreSql::GetLastError()
-{
-    return this->last_error;
-}
-
-DLLAPI void DllPostgreSqlGetLastError(const int wrapper, wchar_t * const last_error)
-{
-    try {
-        PostgreSql * const _wrapper = GetPostgreSql(wrapper);
-        std::wstring _last_error = _wrapper->GetLastError();
-        wcscpy_s(last_error, (_last_error.length() + 1), _last_error.c_str());
-    }
-    catch (...) {
-        FatalErrorMessageBox(L"DllPostgreSqlGetLastError - called on already destroyed wrapper.");
-    }
-}
-
-//
 // NumFields
 //
 const int PostgreSql::NumFields()
@@ -378,7 +358,6 @@ const bool PostgreSql::Query(const std::wstring query)
     }
 
     std::string _query;
-    this->last_error = L"";
     UnicodeToAnsi(query, &_query);
     this->result = PQexec(this->connection, _query.c_str());
 
@@ -389,6 +368,7 @@ const bool PostgreSql::Query(const std::wstring query)
         log_message << "SQL: " << query;
     }
     this->logger->Debug(LOG(log_message));
+    
     switch (PQresultStatus(this->result))
     {
         case PGRES_EMPTY_QUERY: {
@@ -415,10 +395,12 @@ const bool PostgreSql::Query(const std::wstring query)
             break;
         }
         case PGRES_BAD_RESPONSE:
+            log_message << " PGRES_BAD_RESPONSE ";
         case PGRES_NONFATAL_ERROR:
+            log_message << " PGRES_NONFATAL_ERROR ";
         case PGRES_FATAL_ERROR: {
             log_message << PQresultErrorMessage(this->result);
-            this->logger->Critical(LOG(log_message));
+            this->logger->Error(LOG(log_message));
             this->ClearResult();
             return false;
         }

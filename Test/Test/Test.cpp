@@ -42,8 +42,8 @@ int wmain(int argc, wchar_t * argv[])
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
     //DllPostgreSqlConnect(wrapper, L"host=192.168.0.107 user=test dbname=test");
-    //DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
-    DllPostgreSqlConnect(wrapper, L"host=10.0.1.14 user=test dbname=test");
+    DllPostgreSqlConnect(wrapper, L"host=172.16.42.9 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=10.0.1.14 user=test dbname=test");
 
     std::wcout << "client version = " << DllPostgreSqlClientVersion(wrapper) << std::endl;
     std::wcout << "server version = " << DllPostgreSqlServerVersion(wrapper) << std::endl;
@@ -175,21 +175,18 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
-    // CASE: INSERT COLLISION
-    std::wcout << std::endl << "CASE: INSERT COLLISION" << std::endl;
+    // CASE: INSERT COLLISION AND ON CONFLICT DO NOTHING
+    std::wcout << std::endl << "CASE: INSERT COLLISION AND ON CONFLICT DO NOTHING" << std::endl;
     query << "INSERT INTO \"" << _test_data_table << "\" (\"symbol\", \"timeframe\", \"open\", \"high\", \"low\", \"close\") ";
     query << "VALUES ('SVKCZK', 1993, 1.0, 1.0, 1.0, 1.0)";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlClearResult(wrapper);
     DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
     DllPostgreSqlClearResult(wrapper);
+    query << " ON CONFLICT DO NOTHING";
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlClearResult(wrapper);
     query.str(L"");
-
-    // CASE: GET LAST ERROR (FROM SILENCED COLLISION)
-    std::wcout << std::endl << "CASE: GET LAST ERROR (FROM SILENCED COLLISION)" << std::endl;
-    wchar_t * last_error = new wchar_t[BUFFER_SIZE];
-    DllPostgreSqlGetLastError(wrapper, last_error);
-    std::wcout << "last_error = " << last_error << std::endl;
 
     // CASE: UPDATE COLLISION
     std::wcout << std::endl << "CASE: UPDATE COLLISION" << std::endl;
@@ -198,8 +195,6 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, query.str().c_str());
     DllPostgreSqlClearResult(wrapper);
     query.str(L"");
-    DllPostgreSqlGetLastError(wrapper, last_error); // last error on successful query
-    std::wcout << "last_error = " << last_error << std::endl;
     query << "UPDATE \"" << _test_data_table << "\" SET \"open\" = 1.0 WHERE \"open\" = 2.0";
     DllPostgreSqlQuery(wrapper, query.str().c_str()); // collison on unique index
     DllPostgreSqlClearResult(wrapper);

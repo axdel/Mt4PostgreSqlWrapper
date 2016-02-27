@@ -26,8 +26,6 @@ private:
     int num_fields = 0;
     std::wstring affected_rows = L"";
 
-    std::wstring last_error = L"";
-
     Logger * logger = NULL;
 
 public:
@@ -42,7 +40,6 @@ public:
     const bool Connect(const std::wstring connection_string);
     const bool FetchField(wchar_t * const field, const int row_num, const int field_num);
     const std::wstring GetFieldList();
-    const std::wstring GetLastError();
     const int NumFields();
     const int NumRows();
     const bool Query(const std::wstring query);
@@ -68,7 +65,6 @@ DLLAPI void DllPostgreSqlClose(const int wrapper);
 DLLAPI const bool DllPostgreSqlConnect(const int wrapper, const wchar_t * const connection_string);
 DLLAPI const bool DllPostgreSqlFetchField(const int wrapper, wchar_t * const field, const int row_num, const int field_num);
 DLLAPI void DllPostgreSqlGetFieldList(const int wrapper, wchar_t * const field_list);
-DLLAPI void DllPostgreSqlGetLastError(const int wrapper, wchar_t * const last_error);
 DLLAPI const int DllPostgreSqlNumFields(const int wrapper);
 DLLAPI const int DllPostgreSqlNumRows(const int wrapper);
 DLLAPI const bool DllPostgreSqlQuery(const int wrapper, const wchar_t * const query);

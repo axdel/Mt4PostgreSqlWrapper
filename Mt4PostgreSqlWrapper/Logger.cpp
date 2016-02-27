@@ -106,9 +106,8 @@ DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout)
 //
 void Logger::Debug(std::wstringstream & log_message)
 {
-    if (this->log_debug) {
-        this->WriteLog(log_message, L"DEBUG");
-    }
+    if (this->log_debug) { this->WriteLog(log_message, L"DEBUG"); }
+    log_message.str(L""); // clear message
 }
 
 DLLAPI void DllLoggerDebug(const int logger, const wchar_t * const log_message)

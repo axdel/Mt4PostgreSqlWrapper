@@ -8,7 +8,7 @@
 
 #define DLLAPI extern "C" __declspec(dllexport)
 
-#define WRAPPER_VERSION L"2016.02.26"
+#define WRAPPER_VERSION L"2016.02.27"
 
 namespace {
     inline void AnsiToUnicode(const std::string & in, std::wstring * const out) {
