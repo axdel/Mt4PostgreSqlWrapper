@@ -177,8 +177,8 @@ const bool PostgreSql::CheckConnection()
         return false;
     }
 
-    log_message << "Connection closed, trying to reconnect...";
-    this->logger->Error(LOG(log_message));
+    log_message << "Connection dropped, trying to reconnect...";
+    this->logger->Warning(LOG(log_message));
     this->Close();
     return this->Connect(this->connection_string, this->max_connection_attempts, this->failed_connection_sleep);
 }
