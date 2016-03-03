@@ -19,7 +19,7 @@ private:
     std::string _connection_string = "";
 
     int max_connection_attempts = 10;
-    int failed_connection_sleep = 600;
+    int failed_connection_sleep = 6000;
 
     PGresult * result = NULL;
     int num_rows = 0;
