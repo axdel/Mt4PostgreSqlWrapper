@@ -72,7 +72,14 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlQuery(wrapper, L"");
     DllPostgreSqlClearResult(wrapper);
 
-    // CASE: DROP TABLE IF EXISTS (UNCLEARED RESULT)
+    // CASE: DROP INDEX IF EXISTS
+    std::wcout << std::endl << "CASE: DROP INDEX IF EXISTS" << std::endl;
+    query << "DROP INDEX IF EXISTS possible_unique_index_idx";
+    DllPostgreSqlQuery(wrapper, query.str().c_str());
+    DllPostgreSqlClearResult(wrapper);
+    query.str(L"");
+
+    // CASE: DROP INDEX IF EXISTS
     std::wcout << std::endl << "CASE: DROP TABLE IF EXISTS (UNCLEARED RESULT)" << std::endl;
     query << "DROP TABLE IF EXISTS \"" << _test_data_table << "\"";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
