@@ -12,12 +12,25 @@ int wmain(int argc, wchar_t * argv[])
 {
     size_t BUFFER_SIZE = 1024;	// max string size
 
-    std::wstring _test_data_table = L"_test_data_table";
+    std::wstring _test_data_table = L"_test_data";
     std::wstringstream query;
 
-    const int logger = DllLoggerInit(L"C:\\Logs\\dll-test.log", L"[wrapper]");
+    const int logger = DllLoggerInit();
     DllLoggerLogToStdout(logger, true);
     DllLoggerLogDebug(logger, true);
+    std::wcout << std::endl << "CASE: QUERY ON UNKNOWN DATABASE" << std::endl;
+
+    // CASE: WRITE LOG WITH NO LOG FILE
+    std::wcout << std::endl << "CASE: WRITE LOG WITH NO LOG FILE" << std::endl;
+    DllLoggerInfo(logger, L"This is info message should not be visible");
+
+    // CASE: CREATE LOG FILE
+    std::wcout << std::endl << "CASE: CREATE LOG FILE" << std::endl;
+    DllLoggerCreate(logger, L"C:\\Logs\\dll-test.log", L"[wrapper]");
+
+    // CASE: WRITE LOG
+    std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
+    DllLoggerInfo(logger, L"This is info message from logger");
 
     const int wrapper = DllPostgreSqlInit(logger);
 
@@ -40,15 +53,11 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlConnect(wrapper, L"host=localhost user=bad_user dbname=bad_database", 3, 3000);
     DllPostgreSqlClose(wrapper);
 
-    // CASE: WRITE LOG
-    std::wcout << std::endl << "CASE: WRITE LOG" << std::endl;
-    DllLoggerInfo(logger, L"This is info message from logger");
-
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
     //DllPostgreSqlConnect(wrapper, L"host=192.168.0.107 user=test dbname=test");
-    DllPostgreSqlConnect(wrapper, L"host=172.16.42.9 user=test dbname=test");
-    //DllPostgreSqlConnect(wrapper, L"host=10.0.1.14 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=172.16.42.9 user=test dbname=test");
+    DllPostgreSqlConnect(wrapper, L"host=10.0.1.17 user=test dbname=test");
 
     std::wcout << "client version = " << DllPostgreSqlClientVersion(wrapper) << std::endl;
     std::wcout << "server version = " << DllPostgreSqlServerVersion(wrapper) << std::endl;

@@ -13,8 +13,8 @@
 class Logger
 {
 private:
-    const std::string log_file = "";
-    const std::string log_prefix = "";
+    std::string log_file = "";
+    std::string log_prefix = "";
 
     HANDLE log_file_handle = NULL;
     
@@ -24,9 +24,10 @@ private:
     void WriteLog(std::wstringstream & log_message, const std::wstring log_level);
 
 public:
-    Logger(const std::string log_file, const std::string log_prefix = "");
+    Logger();
     ~Logger();
     
+    const bool Create(const std::string log_file, const std::string log_prefix = "");
     const int GetLogger();
     void LogDebug(const bool log_debug);
     void LogToStdout(const bool log_to_stdout);
@@ -47,8 +48,9 @@ namespace {
 //
 // DLLAPI
 //
+DLLAPI const bool DllLoggerCreate(const int logger, const wchar_t * const log_file, const wchar_t * const log_prefix);
 DLLAPI void DllLoggerDestroy(const int logger);
-DLLAPI const int DllLoggerInit(const wchar_t * const log_file, const wchar_t * const log_prefix);
+DLLAPI const int DllLoggerInit();
 DLLAPI const int DllLoggerGetLogger(const int logger);
 DLLAPI void DllLoggerLogDebug(const int logger, const bool log_debug);
 DLLAPI void DllLoggerLogToStdout(const int logger, const bool log_to_stdout);

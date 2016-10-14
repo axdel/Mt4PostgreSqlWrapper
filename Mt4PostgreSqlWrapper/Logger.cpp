@@ -7,26 +7,11 @@
 //
 // LoggerInit
 //
-Logger::Logger(const std::string log_file, const std::string log_prefix) : log_file(log_file), log_prefix(log_prefix)
-{
-    std::wstringstream error_message;
+Logger::Logger() {}
 
-    this->log_file_handle = CreateFileA(
-        this->log_file.c_str(), FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL
-    );
-    if (this->log_file_handle == INVALID_HANDLE_VALUE) {
-        this->log_file_handle = NULL;
-        error_message << "Cannot create file: " << this->log_file.c_str() << " (error code: " << GetLastError() << ")";
-        FatalErrorMessageBox(error_message.str());
-    }
-}
-
-DLLAPI const int DllLoggerInit(const wchar_t * const log_file, const wchar_t * const log_prefix)
+DLLAPI const int DllLoggerInit()
 {
-    std::string _log_file, _log_prefix;
-    UnicodeToAnsi(log_file, &_log_file);
-    UnicodeToAnsi(log_prefix, &_log_prefix);
-    return reinterpret_cast<const int>(new Logger(_log_file, _log_prefix));
+    return reinterpret_cast<const int>(new Logger());
 }
 
 //
@@ -42,6 +27,36 @@ DLLAPI void DllLoggerDestroy(const int logger)
     } catch (...) {
         FatalErrorMessageBox(L"DllLoggerDestroy - called on already destroyed logger.");
     }
+}
+
+//
+// Create
+//
+const bool Logger::Create(const std::string log_file, const std::string log_prefix)
+{
+    std::wstringstream error_message;
+
+    this->log_file = log_file;
+    this->log_prefix = log_prefix;
+    this->log_file_handle = CreateFileA(
+        this->log_file.c_str(), FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL
+    );
+    if (this->log_file_handle == INVALID_HANDLE_VALUE) {
+        this->log_file_handle = NULL;
+        error_message << "Cannot create file: " << this->log_file.c_str() << " (error code: " << GetLastError() << ")";
+        FatalErrorMessageBox(error_message.str());
+        return false;
+    }
+    return true;
+}
+
+DLLAPI const bool DllLoggerCreate(const int logger, const wchar_t * const log_file, const wchar_t * const log_prefix)
+{
+    Logger * const _logger = GetLogger(logger);
+    std::string _log_file, _log_prefix;
+    UnicodeToAnsi(log_file, &_log_file);
+    UnicodeToAnsi(log_prefix, &_log_prefix);
+    return _logger->Create(_log_file, _log_prefix);
 }
 
 //

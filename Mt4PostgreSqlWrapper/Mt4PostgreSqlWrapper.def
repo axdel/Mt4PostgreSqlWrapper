@@ -15,6 +15,7 @@ DllPostgreSqlNumRows
 DllPostgreSqlQuery
 DllPostgreSqlServerVersion
 DllPostgreSqlWrapperVersion
+DllLoggerCreate
 DllLoggerCritical
 DllLoggerDebug
 DllLoggerDestroy
