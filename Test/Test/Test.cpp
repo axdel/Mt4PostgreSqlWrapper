@@ -56,11 +56,8 @@ int wmain(int argc, wchar_t * argv[])
     // CASE: SUCCESSFUL CONNECTION
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION" << std::endl;
     //DllPostgreSqlConnect(wrapper, L"host=192.168.0.107 user=test dbname=test");
-    //DllPostgreSqlConnect(wrapper, L"host=172.16.42.9 user=test dbname=test");
-    DllPostgreSqlConnect(wrapper, L"host=10.0.1.17 user=test dbname=test");
-
-    std::wcout << "client version = " << DllPostgreSqlClientVersion(wrapper) << std::endl;
-    std::wcout << "server version = " << DllPostgreSqlServerVersion(wrapper) << std::endl;
+    DllPostgreSqlConnect(wrapper, L"host=172.16.42.4 user=test dbname=test");
+    //DllPostgreSqlConnect(wrapper, L"host=10.0.1.17 user=test dbname=test");
 
     // CASE: SUCCESSFUL CONNECTION CHECK
     std::wcout << std::endl << "CASE: SUCCESSFUL CONNECTION CHECK" << std::endl;
@@ -79,7 +76,7 @@ int wmain(int argc, wchar_t * argv[])
     DllPostgreSqlClearResult(wrapper);
     query.str(L"");
 
-    // CASE: DROP INDEX IF EXISTS
+    // CASE: DROP TABLE IF EXISTS
     std::wcout << std::endl << "CASE: DROP TABLE IF EXISTS (UNCLEARED RESULT)" << std::endl;
     query << "DROP TABLE IF EXISTS \"" << _test_data_table << "\"";
     DllPostgreSqlQuery(wrapper, query.str().c_str());
@@ -277,6 +274,11 @@ int wmain(int argc, wchar_t * argv[])
         }
         std::wcout << std::endl;
     }
+
+    // CASE: CLIENT AND SERVER VERSION
+    std::wcout << std::endl << "CASE: CLIENT AND SERVER VERSION" << std::endl;
+    std::wcout << "client version = " << DllPostgreSqlClientVersion(wrapper) << std::endl;
+    std::wcout << "server version = " << DllPostgreSqlServerVersion(wrapper) << std::endl;
 
     // CASE: CLOSE CONNECTION
     std::wcout << std::endl << "CASE: CLOSE CONNECTION" << std::endl;
